@@ -24,3 +24,15 @@ Der Kunde sieht nach dem Absenden keine JSON- oder Plain-Text-Vorschau mehr.
 Die Demo bereitet stattdessen ein strukturiertes Datenpaket als Datei vor.
 
 Hinweis: GitHub Pages ist statisch. Für eine echte automatische Übermittlung an den Gutachter braucht die App später ein Backend oder einen E-Mail-/Webhook-Dienst.
+
+
+## Version 4
+
+- Progressive Disclosure korrigiert:
+  - Unfallgegner-Felder erscheinen erst bei „Ja“
+  - Anwalt-Felder erscheinen erst bei „Ja“
+  - Werkstatt-Felder erscheinen erst bei „Ja“
+  - Sonstiger Empfänger erscheint erst bei Auswahl „Sonstige Person“
+- Kunden sehen keine JSON- oder Plain-Text-Codeansicht mehr.
+- Nach Absenden erscheint eine Dankesseite.
+- JSON wird als Datei vorbereitet und kann geteilt oder heruntergeladen werden.

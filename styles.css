@@ -23,3 +23,52 @@
 .done-head h1 {
   max-width: 900px;
 }
+
+
+.field-wrap {
+  margin-bottom: 16px;
+  animation: fieldIn .18s ease;
+}
+
+.review-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  margin-top: 12px;
+}
+
+.review-card p {
+  margin: 8px 0;
+  color: var(--muted);
+}
+
+.success-page {
+  max-width: 860px;
+  margin: 40px auto;
+}
+
+.success-mark {
+  width: 74px;
+  height: 74px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  color: #fff;
+  font-size: 38px;
+  font-weight: 900;
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+}
+
+@keyframes fieldIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
