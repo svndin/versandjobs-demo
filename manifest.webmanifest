@@ -1,0 +1,16 @@
+{
+  "name": "GutachtenLink",
+  "short_name": "GutachtenLink",
+  "description": "Versand- und Beteiligtenassistent für Kfz-Gutachter",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f7fb",
+  "theme_color": "#102033",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
