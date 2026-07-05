@@ -5,77 +5,1392 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#102033">
   <title>GutachtenLink – Versand- & Beteiligtenassistent</title>
+
   <style>
-    :root{
-      --bg:#f3f7fb;--text:#102033;--muted:#607086;--line:#dce6f1;
-      --blue:#1667f2;--blue2:#5c8dff;--green:#20b69f;--warn:#f5a623;
-      --shadow:0 18px 50px rgba(16,32,51,.13);--radius:22px;
+    :root {
+      --bg: #f3f7fb;
+      --text: #102033;
+      --muted: #607086;
+      --line: #dce6f1;
+      --blue: #1667f2;
+      --blue-dark: #0f4da7;
+      --green: #20b69f;
+      --warn: #f5a623;
+      --shadow: 0 18px 50px rgba(16,32,51,.13);
+      --radius: 22px;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);
-      background:radial-gradient(circle at top left,rgba(32,182,159,.22),transparent 30rem),
-                 radial-gradient(circle at top right,rgba(22,103,242,.18),transparent 32rem),var(--bg);
-      min-height:100vh;
+
+    * {
+      box-sizing: border-box;
     }
-    .shell{width:min(1180px,100%);margin:0 auto;padding:20px}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px;position:sticky;top:0;padding:10px 0;backdrop-filter:blur(16px);z-index:5}
-    .brand{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
-    .logo{width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#102033,#1667f2);display:grid;place-items:center;color:#fff;font-weight:950;box-shadow:0 10px 28px rgba(16,32,51,.25)}
-    .brand b,.brand span{display:block}.brand span{font-size:13px;color:var(--muted)}
-    button,.btn{border:0;border-radius:14px;min-height:46px;padding:0 18px;font-weight:850;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.16s}
-    button:hover,.btn:hover{transform:translateY(-1px)}
-    .primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 12px 24px rgba(22,103,242,.23)}
-    .secondary{background:#eef4ff;color:#0f4da7}.ghost{background:rgba(255,255,255,.75);color:var(--text);border:1px solid rgba(255,255,255,.9)}
-    .small{min-height:38px;padding:0 12px;font-size:13px}.hidden{display:none!important}
-    .hero{display:grid;grid-template-columns:1.12fr .88fr;gap:30px;align-items:center;min-height:560px}
-    .eyebrow{margin:0 0 12px;color:#0f4da7;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:950}
-    h1{font-size:clamp(40px,6vw,72px);line-height:.96;letter-spacing:-.07em;margin:0 0 22px}
-    h2{font-size:24px;letter-spacing:-.03em;margin:0 0 14px}h3{margin:0 0 10px}
-    .lead{font-size:20px;line-height:1.55;color:var(--muted);margin:0 0 26px}.lead.small{font-size:16px;max-width:760px}
-    .actions{display:flex;gap:12px;flex-wrap:wrap}.phone{display:grid;place-items:center}
-    .phone-card{width:min(360px,100%);min-height:420px;border-radius:36px;background:linear-gradient(180deg,#fff,#f5f8ff);box-shadow:var(--shadow);padding:28px;border:1px solid #fff}
-    .pill{display:inline-flex;background:#e9fff9;color:#08776b;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:900;margin-bottom:18px}
-    .row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:10px;font-weight:850}
-    .row.ok span{color:var(--green)}.row.warn span{color:var(--warn)}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:20px 0}.grid.two{grid-template-columns:repeat(2,1fr)}
-    .card,.feature{background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.95);box-shadow:var(--shadow);border-radius:var(--radius);padding:24px;backdrop-filter:blur(18px)}
-    .feature p,.muted{color:var(--muted);line-height:1.55}
-    .num{width:38px;height:38px;border-radius:13px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--green));display:grid;place-items:center;font-weight:950;margin-bottom:16px}
-    .page-head{padding:20px 0}.back{background:transparent;color:var(--muted);padding-left:0;min-height:38px}
-    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-    label{display:flex;flex-direction:column;gap:8px;font-weight:850;color:#26374d}
-    input,select,textarea{width:100%;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:14px;padding:14px;font:inherit;outline:none}
-    input:focus,select:focus,textarea:focus{border-color:rgba(22,103,242,.7);box-shadow:0 0 0 4px rgba(22,103,242,.12)}
-    textarea{min-height:100px;resize:vertical}.linkbox{background:#0f1e30;color:#e6f0ff;border-radius:18px;padding:16px;word-break:break-word}
-    .case-item{display:flex;justify-content:space-between;gap:10px;background:#fff;border:1px solid var(--line);padding:14px;border-radius:16px;margin-top:10px}
-    .progress{height:10px;background:#dfe8f5;border-radius:999px;overflow:hidden}.progress div{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));transition:.2s}
-    .progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-    .options{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.option{padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;cursor:pointer;font-weight:850;display:flex;gap:10px;align-items:center}.option input{width:auto}
-    .nav{display:flex;justify-content:space-between;margin-top:20px;gap:12px}.chips{display:flex;flex-wrap:wrap;gap:9px}
-    .chip{background:#eef4ff;color:#0f4da7;padding:9px 11px;border-radius:999px;font-weight:900;font-size:13px}.chip.warn{background:#fff3da;color:#9b6400}
-    .field-wrap{margin-bottom:16px;animation:fieldIn .18s ease}.review-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:12px}
-    .success-page{max-width:860px;margin:40px auto}.success-mark{width:74px;height:74px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;font-size:38px;font-weight:900;box-shadow:var(--shadow);margin-bottom:22px}
-    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#102033;color:#fff;padding:12px 16px;border-radius:999px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.18s;z-index:20}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    @keyframes fieldIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    @media(max-width:820px){.shell{padding:14px}.topbar .ghost{display:none}.hero,.grid,.grid.two,.form-grid{grid-template-columns:1fr}.hero{min-height:auto;padding:28px 0 8px}h1{font-size:44px}.lead{font-size:17px}.actions{flex-direction:column;align-items:stretch}button,.btn{width:100%}.options{grid-template-columns:1fr}.phone-card{min-height:320px}}
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(32,182,159,.22), transparent 30rem),
+        radial-gradient(circle at top right, rgba(22,103,242,.18), transparent 32rem),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      position: sticky;
+      top: 0;
+      padding: 10px 0;
+      backdrop-filter: blur(16px);
+      z-index: 5;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #102033, #1667f2);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 950;
+      box-shadow: 0 10px 28px rgba(16,32,51,.25);
+    }
+
+    .brand b,
+    .brand span {
+      display: block;
+    }
+
+    .brand span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    button,
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      min-height: 46px;
+      padding: 0 18px;
+      font-weight: 850;
+      font-size: 15px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: .16s;
+    }
+
+    button:hover,
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--blue), #5c8dff);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(22,103,242,.23);
+    }
+
+    .secondary {
+      background: #eef4ff;
+      color: var(--blue-dark);
+    }
+
+    .ghost {
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.9);
+    }
+
+    .small {
+      min-height: 38px;
+      padding: 0 12px;
+      font-size: 13px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 30px;
+      align-items: center;
+      min-height: 560px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--blue-dark);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    h1 {
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: .96;
+      letter-spacing: -.07em;
+      margin: 0 0 22px;
+    }
+
+    h2 {
+      font-size: 24px;
+      letter-spacing: -.03em;
+      margin: 0 0 14px;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+    }
+
+    .lead {
+      font-size: 20px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0 0 26px;
+    }
+
+    .lead.small {
+      font-size: 16px;
+      max-width: 760px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .phone {
+      display: grid;
+      place-items: center;
+    }
+
+    .phone-card {
+      width: min(360px, 100%);
+      min-height: 420px;
+      border-radius: 36px;
+      background: linear-gradient(180deg, #fff, #f5f8ff);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      border: 1px solid #fff;
+    }
+
+    .pill {
+      display: inline-flex;
+      background: #e9fff9;
+      color: #08776b;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 10px;
+      font-weight: 850;
+    }
+
+    .row.ok span {
+      color: var(--green);
+    }
+
+    .row.warn span {
+      color: var(--warn);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 20px 0;
+    }
+
+    .card,
+    .feature {
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.95);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(18px);
+    }
+
+    .feature p,
+    .muted {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .num {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      display: grid;
+      place-items: center;
+      font-weight: 950;
+      margin-bottom: 16px;
+    }
+
+    .page-head {
+      padding: 20px 0;
+    }
+
+    .back {
+      background: transparent;
+      color: var(--muted);
+      padding-left: 0;
+      min-height: 38px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-weight: 850;
+      color: #26374d;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 14px;
+      padding: 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(22,103,242,.7);
+      box-shadow: 0 0 0 4px rgba(22,103,242,.12);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .linkbox {
+      background: #0f1e30;
+      color: #e6f0ff;
+      border-radius: 18px;
+      padding: 16px;
+      word-break: break-word;
+    }
+
+    .case-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 14px;
+      border-radius: 16px;
+      margin-top: 10px;
+    }
+
+    .progress {
+      height: 10px;
+      background: #dfe8f5;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress div {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transition: .2s;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .option {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 850;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .option input {
+      width: auto;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      gap: 12px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .chip {
+      background: #eef4ff;
+      color: var(--blue-dark);
+      padding: 9px 11px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .chip.warn {
+      background: #fff3da;
+      color: #9b6400;
+    }
+
+    .field-wrap {
+      margin-bottom: 16px;
+      animation: fieldIn .18s ease;
+    }
+
+    .review-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    .success-page {
+      max-width: 860px;
+      margin: 40px auto;
+    }
+
+    .success-mark {
+      width: 74px;
+      height: 74px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      color: #fff;
+      font-size: 38px;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      background: #102033;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: .18s;
+      z-index: 20;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes fieldIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 820px) {
+      .shell {
+        padding: 14px;
+      }
+
+      .topbar .ghost {
+        display: none;
+      }
+
+      .hero,
+      .grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 28px 0 8px;
+      }
+
+      h1 {
+        font-size: 44px;
+      }
+
+      .lead {
+        font-size: 17px;
+      }
+
+      .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      button,
+      .btn {
+        width: 100%;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .phone-card {
+        min-height: 320px;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="shell">
     <header class="topbar">
       <div class="brand" onclick="App.goHome()" role="button" tabindex="0">
         <div class="logo">GL</div>
-        <div><b>GutachtenLink</b><span>Versand- & Beteiligtenassistent</span></div>
+        <div>
+          <b>GutachtenLink</b>
+          <span>Versand- & Beteiligtenassistent</span>
+        </div>
       </div>
       <button class="ghost small" onclick="App.showDemoInfo()">Demo-Hinweis</button>
     </header>
+
     <main id="app"></main>
   </div>
+
   <div id="toast" class="toast"></div>
 
-<script>
-const App=(()=>{const app=document.getElementById("app"),toast=document.getElementById("toast");let generatedLink="",currentStep=0,customerData={},latestSummary=null;const steps=[{title:"Ihre Kontaktdaten",fields:[["fullName","Vollständiger Name","text","Max Müller"],["phone","Telefonnummer","tel","+49 176 12345678"],["email","E-Mail","email","max@example.de"],["address","Adresse","text","Musterstraße 12, 10115 Berlin"]]},{title:"Fahrzeug",fields:[["licensePlate","Kennzeichen","text","B AB 1234"],["vehicle","Fahrzeug / Modell","text","BMW 320d"],["vehicleOwner","Fahrzeughalter, falls abweichend","text",""]]},{title:"Schadenfall",fields:[["damageDate","Schadentag","date",""],["damageLocation","Schadenort / Unfallort","text","Berlin"],["damageType","Schadenart","select",["Haftpflichtschaden","Kaskoschaden","Teilkasko / Hagel","Parkschaden","Unklar"]],["damageArea","Schadenbereich","select",["vorne","hinten","links","rechts","vorne links","vorne rechts","hinten links","hinten rechts","rundum","unklar"]],["shortDescription","Kurze Beschreibung","textarea","Auffahrunfall, Schaden hinten am Stoßfänger."]]},{title:"Unfallgegner",fields:[["opponentKnown","Ist ein Unfallgegner bekannt?","select",["Ja","Nein","Unklar"]],["opponentName","Name Unfallgegner","text",""],["opponentPlate","Kennzeichen Unfallgegner","text",""],["opponentInsurance","Versicherung Unfallgegner","text",""],["insuranceClaimNo","Schadennummer / Aktenzeichen Versicherung","text",""]]},{title:"Anwalt und Werkstatt",fields:[["lawyerKnown","Ist ein Rechtsanwalt beteiligt?","select",["Ja","Nein","Noch nicht"]],["lawyerName","Kanzlei / Rechtsanwalt","text",""],["lawyerEmail","E-Mail Kanzlei","email",""],["repairShopKnown","Gibt es eine Werkstatt?","select",["Ja","Nein","Noch offen"]],["repairShopName","Werkstatt / Autohaus","text",""],["repairShopEmail","E-Mail Werkstatt","email",""]]},{title:"Wer soll das Gutachten erhalten?",checkboxes:[["sendCustomer","Ich selbst / Kunde"],["sendLawyer","Rechtsanwalt"],["sendInsurance","Versicherung"],["sendRepairShop","Werkstatt"],["sendOther","Sonstige Person"]],fields:[["otherRecipient","Sonstiger Empfänger","text",""],["notes","Weitere Hinweise","textarea",""]]},{title:"Prüfen und absenden",review:true}];function qs(n){return new URL(location.href).searchParams.get(n)||""}function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}function attr(v){return esc(v).replaceAll("'","&#039;")}function toastMsg(m){toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1800)}function goHome(){history.pushState({},"",location.pathname);app.innerHTML=`<section class="hero"><div><p class="eyebrow">Mobile Fallaufnahme für Kfz-Gutachter</p><h1>Der Kunde füllt die Beteiligten ein. Der Gutachter erhält eine fertige Vorlage.</h1><p class="lead">Senden Sie einen Aufnahme-Link per SMS oder E-Mail. Der Kunde ergänzt Anwalt, Versicherung, Werkstatt und Versandwünsche. Sie erhalten alles strukturiert zurück.</p><div class="actions"><button class="primary" onclick="App.showInspector()">Fall anlegen</button><button class="secondary" onclick="App.openCustomerDemo()">Kundenansicht testen</button></div></div><div class="phone"><div class="phone-card"><div class="pill">Fall 2026-00123</div><h3>Versandvorschlag</h3><div class="row ok"><span>✓</span> Kunde</div><div class="row ok"><span>✓</span> Rechtsanwalt</div><div class="row ok"><span>✓</span> Versicherung</div><div class="row warn"><span>!</span> Schadennummer fehlt</div></div></div></section><section class="grid"><article class="feature"><div class="num">1</div><h3>Gutachter sendet Link</h3><p>Telefonnummer oder E-Mail eingeben, Fallreferenz eintragen, Link senden.</p></article><article class="feature"><div class="num">2</div><h3>Kunde füllt aus</h3><p>Geführte Fragen zu Kunde, Fahrzeug, Unfallgegner, Versicherung, Anwalt und Werkstatt.</p></article><article class="feature"><div class="num">3</div><h3>Strukturierte Rückgabe</h3><p>Versandvorschlag, offene Angaben und JSON-Datei für spätere Schnittstellen.</p></article></section><section class="card"><h2>Demo-Ziel</h2><p class="muted">Diese GitHub-Pages-Version ist nur zur optischen und funktionalen Validierung gedacht. Sie speichert keine Daten auf einem Server.</p></section>`}function showInspector(){history.pushState({},"",location.pathname+"#inspector");app.innerHTML=`<section class="page-head"><button class="back" onclick="App.goHome()">← Zurück</button><p class="eyebrow">Gutachter-App</p><h1>Neuen Aufnahme-Link erstellen</h1><p class="lead small">Für die Demo wird der Link lokal erzeugt. Versand erfolgt über SMS-/E-Mail-App des Handys.</p></section><section class="card"><div class="form-grid"><label>Interne Fallnummer / Schadennummer<input id="caseId" placeholder="z. B. 2026-00123"></label><label>Kundenname optional<input id="clientName" placeholder="z. B. Max Müller"></label><label>Telefonnummer für SMS<input id="clientPhone" placeholder="z. B. +4917612345678" inputmode="tel"></label><label>E-Mail des Kunden<input id="clientEmail" placeholder="kunde@example.de" inputmode="email"></label><label>Gutachter-E-Mail für Rückgabe<input id="inspectorEmail" placeholder="gutachter@example.de" inputmode="email"></label><label>Büro / Gutachtername<input id="officeName" placeholder="z. B. SV-Büro Gutachter"></label></div><div class="actions" style="margin-top:18px"><button class="primary" onclick="App.generateIntakeLink()">Aufnahme-Link erzeugen</button><button class="secondary" onclick="App.fillExample()">Beispiel füllen</button></div></section><section id="linkResult" class="card hidden" style="margin-top:18px"><h2>Aufnahme-Link</h2><p class="muted">Diesen Link kann der Kunde öffnen.</p><div id="generatedLink" class="linkbox"></div><div class="actions" style="margin-top:14px"><button class="secondary" onclick="App.copyGeneratedLink()">Link kopieren</button><a id="smsLink" class="btn secondary" href="#">Per SMS öffnen</a><a id="emailLink" class="btn primary" href="#">Per E-Mail öffnen</a></div></section><section class="card" style="margin-top:18px"><h2>Demo-Fälle</h2><div id="caseList"></div></section>`;renderCaseList()}function showDemoInfo(){alert("Demo-Hinweis:\\n\\nDiese GitHub-Pages-Version ist statisch. Sie kann Links erzeugen und SMS/E-Mail-Apps öffnen, aber keine Daten automatisch auf einem Server speichern.\\n\\nFür einen echten Pilotbetrieb braucht die App später ein Backend.")}function fillExample(){document.getElementById("caseId").value="2026-00123";document.getElementById("clientName").value="Max Müller";document.getElementById("clientPhone").value="+4917612345678";document.getElementById("clientEmail").value="kunde@example.de";document.getElementById("inspectorEmail").value="gutachter@example.de";document.getElementById("officeName").value="SV-Büro Gutachter"}function generateIntakeLink(){const caseId=document.getElementById("caseId").value.trim()||`FALL-${Date.now()}`,clientName=document.getElementById("clientName").value.trim(),clientPhone=document.getElementById("clientPhone").value.trim(),clientEmail=document.getElementById("clientEmail").value.trim(),inspectorEmail=document.getElementById("inspectorEmail").value.trim(),officeName=document.getElementById("officeName").value.trim(),params=new URLSearchParams({mode:"customer",case:caseId,inspector:inspectorEmail,office:officeName});if(clientName)params.set("name",clientName);generatedLink=`${location.origin}${location.pathname}?${params.toString()}`;const msg=`Bitte vervollständigen Sie Ihre Schadenfall-Daten für ${officeName||"den Gutachter"}.\\n\\n${generatedLink}\\n\\nDauer: ca. 3–5 Minuten.`,subject=`Schadenaufnahme ${caseId}`;document.getElementById("generatedLink").textContent=generatedLink;document.getElementById("smsLink").href=`sms:${encodeURIComponent(clientPhone)}?&body=${encodeURIComponent(msg)}`;document.getElementById("emailLink").href=`mailto:${encodeURIComponent(clientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;document.getElementById("linkResult").classList.remove("hidden");const cases=JSON.parse(localStorage.getItem("gl_cases")||"[]");cases.unshift({caseId,clientName,createdAt:new Date().toISOString(),link:generatedLink});localStorage.setItem("gl_cases",JSON.stringify(cases.slice(0,10)));renderCaseList()}async function copyGeneratedLink(){if(!generatedLink)return;await navigator.clipboard.writeText(generatedLink);toastMsg("Link kopiert")}function renderCaseList(){const el=document.getElementById("caseList");if(!el)return;const cases=JSON.parse(localStorage.getItem("gl_cases")||"[]");if(!cases.length){el.innerHTML='<p class="muted">Noch keine Demo-Fälle erstellt.</p>';return}el.innerHTML=cases.map(c=>`<div class="case-item"><div><b>${esc(c.caseId)}</b><br><span class="muted">${esc(c.clientName||"ohne Name")} · ${new Date(c.createdAt).toLocaleString("de-DE")}</span></div><button class="secondary small" onclick="navigator.clipboard.writeText('${attr(c.link)}'); App.toast('Link kopiert')">Kopieren</button></div>`).join("")}function openCustomerDemo(){const params=new URLSearchParams({mode:"customer",case:"DEMO-2026-001",inspector:"gutachter@example.de",office:"SV-Büro Gutachter"});history.pushState({},"",`${location.pathname}?${params.toString()}`);startCustomer()}function startCustomer(){currentStep=0;customerData={meta:{caseId:qs("case")||"DEMO",inspectorEmail:qs("inspector"),officeName:qs("office")||"SV-Büro Gutachter",prefilledName:qs("name")}};renderCustomerShell();renderStep()}function renderCustomerShell(){app.innerHTML=`<section class="page-head"><p class="eyebrow">Digitale Schadenaufnahme</p><h1>Angaben zum Schadenfall ergänzen</h1><p class="lead small">Bitte füllen Sie die Angaben so gut wie möglich aus. Unbekannte Felder können frei bleiben.</p></section><section class="card"><div class="progress-top"><b id="progressLabel"></b><span id="caseBadge" class="pill"></span></div><div class="progress"><div id="progressFill"></div></div></section><form id="customerForm" class="card" style="margin-top:18px" onsubmit="App.handleCustomerSubmit(event)"><div id="stepContainer"></div><div class="nav"><button type="button" class="secondary" id="prevBtn" onclick="App.prevStep()">Zurück</button><button type="button" class="primary" id="nextBtn" onclick="App.nextStep()">Weiter</button><button type="submit" class="primary hidden" id="submitBtn">Angaben absenden</button></div></form>`}function renderStep(){const step=steps[currentStep];document.getElementById("progressLabel").textContent=`Schritt ${currentStep+1} von ${steps.length}`;document.getElementById("caseBadge").textContent=customerData.meta.caseId;document.getElementById("progressFill").style.width=`${(currentStep+1)/steps.length*100}%`;let html=`<h2>${esc(step.title)}</h2>`;if(step.review){collectVisibleInputs();html+=renderReview(buildSummaryObject())}else{if(step.checkboxes){html+='<div class="options">';for(const [name,label]of step.checkboxes){html+=`<label class="option"><input type="checkbox" data-field="${name}" ${customerData[name]?"checked":""} onchange="App.handleConditionalChange()"> ${esc(label)}</label>`}html+='</div><br>'}for(const [name,label,type,placeholder]of step.fields||[]){const hidden=getFieldVisibility(name).hidden?" hidden":"",value=customerData[name]||(name==="fullName"&&customerData.meta.prefilledName?customerData.meta.prefilledName:"");if(type==="select"){html+=`<div class="field-wrap${hidden}" data-wrap="${name}"><label>${esc(label)}<select data-field="${name}" onchange="App.handleConditionalChange()"><option value="">Bitte auswählen</option>`;for(const option of placeholder){html+=`<option value="${attr(option)}" ${value===option?"selected":""}>${esc(option)}</option>`}html+='</select></label></div>'}else if(type==="textarea"){html+=`<div class="field-wrap${hidden}" data-wrap="${name}"><label>${esc(label)}<textarea data-field="${name}" placeholder="${attr(placeholder||"")}" oninput="App.handleConditionalChange()">${esc(value)}</textarea></label></div>`}else{html+=`<div class="field-wrap${hidden}" data-wrap="${name}"><label>${esc(label)}<input data-field="${name}" type="${type}" value="${attr(value)}" placeholder="${attr(placeholder||"")}" oninput="App.handleConditionalChange()"></label></div>`}}}document.getElementById("stepContainer").innerHTML=html;document.getElementById("prevBtn").style.visibility=currentStep===0?"hidden":"visible";document.getElementById("nextBtn").classList.toggle("hidden",currentStep===steps.length-1);document.getElementById("submitBtn").classList.toggle("hidden",currentStep!==steps.length-1)}function getFieldVisibility(name){if(["opponentName","opponentPlate","opponentInsurance","insuranceClaimNo"].includes(name))return{hidden:customerData.opponentKnown!=="Ja"};if(["lawyerName","lawyerEmail"].includes(name))return{hidden:customerData.lawyerKnown!=="Ja"};if(["repairShopName","repairShopEmail"].includes(name))return{hidden:customerData.repairShopKnown!=="Ja"};if(name==="otherRecipient")return{hidden:!customerData.sendOther};return{hidden:false}}function applyConditionalVisibility(){document.querySelectorAll("[data-wrap]").forEach(w=>w.classList.toggle("hidden",getFieldVisibility(w.dataset.wrap).hidden))}function handleConditionalChange(){collectVisibleInputs();applyConditionalVisibility()}function collectVisibleInputs(){document.querySelectorAll("[data-field]").forEach(el=>{customerData[el.dataset.field]=el.type==="checkbox"?el.checked:el.value.trim()})}function nextStep(){collectVisibleInputs();if(currentStep<steps.length-1){currentStep++;renderStep()}}function prevStep(){collectVisibleInputs();if(currentStep>0){currentStep--;renderStep()}}function renderReview(s){const r=[];if(s.shipping_jobs.send_to_customer)r.push("Kunde");if(s.shipping_jobs.send_to_lawyer)r.push("Rechtsanwalt");if(s.shipping_jobs.send_to_insurance)r.push("Versicherung");if(s.shipping_jobs.send_to_repair_shop)r.push("Werkstatt");if(s.shipping_jobs.send_to_other)r.push(s.shipping_jobs.other_recipient||"Sonstige Person");return`<p class="muted">Bitte prüfen Sie kurz, ob Ihre Angaben vollständig sind. Danach werden die Daten für den Gutachter vorbereitet.</p><div class="review-card"><h3>Ihre Angaben</h3><p><b>Name:</b> ${esc(s.customer.name||"—")}</p><p><b>Fahrzeug:</b> ${esc(s.vehicle.vehicle||"—")} · ${esc(s.vehicle.license_plate||"—")}</p><p><b>Schaden:</b> ${esc(s.damage.type||"—")} · ${esc(s.damage.area||"—")}</p><h3>Gewünschte Empfänger</h3>${r.length?`<div class="chips">${r.map(x=>`<span class="chip">${esc(x)}</span>`).join("")}</div>`:`<p class="muted">Keine Empfänger ausgewählt.</p>`}${s.missing_fields.length?`<h3>Noch offene Angaben</h3><div class="chips">${s.missing_fields.map(m=>`<span class="chip warn">${esc(m)}</span>`).join("")}</div>`:""}</div>`}function buildSummaryObject(){const d=customerData,missing=[],m=(c,l)=>{if(c)missing.push(l)};m(!d.fullName,"Kundenname");m(!d.phone&&!d.email,"Telefonnummer oder E-Mail Kunde");m(!d.licensePlate,"Kennzeichen Kundenfahrzeug");m(d.opponentKnown==="Ja"&&!d.opponentInsurance,"Versicherung Unfallgegner");m(d.lawyerKnown==="Ja"&&!d.lawyerEmail,"E-Mail Rechtsanwalt");m(d.sendInsurance&&!d.opponentInsurance,"Versand an Versicherung gewünscht, aber Versicherung fehlt");m(d.sendLawyer&&!d.lawyerName,"Versand an Anwalt gewünscht, aber Kanzlei fehlt");m(d.sendRepairShop&&!d.repairShopName,"Versand an Werkstatt gewünscht, aber Werkstatt fehlt");return{meta:d.meta,customer:{name:d.fullName||"",phone:d.phone||"",email:d.email||"",address:d.address||""},vehicle:{license_plate:d.licensePlate||"",vehicle:d.vehicle||"",owner:d.vehicleOwner||""},damage:{date:d.damageDate||"",location:d.damageLocation||"",type:d.damageType||"",area:d.damageArea||"",short_description:d.shortDescription||""},opponent:{known:d.opponentKnown||"",name:d.opponentName||"",license_plate:d.opponentPlate||"",insurance:d.opponentInsurance||"",insurance_claim_no:d.insuranceClaimNo||""},lawyer:{known:d.lawyerKnown||"",name:d.lawyerName||"",email:d.lawyerEmail||""},repair_shop:{known:d.repairShopKnown||"",name:d.repairShopName||"",email:d.repairShopEmail||""},shipping_jobs:{send_to_customer:!!d.sendCustomer,send_to_lawyer:!!d.sendLawyer,send_to_insurance:!!d.sendInsurance,send_to_repair_shop:!!d.sendRepairShop,send_to_other:!!d.sendOther,other_recipient:d.otherRecipient||""},notes:d.notes||"",missing_fields:missing,created_at:new Date().toISOString()}}function buildTextSummary(s){return["FALLAUFNAHME / VERSANDVORSCHLAG",`Fallnummer: ${s.meta.caseId}`,`Büro: ${s.meta.officeName||""}`,"","KUNDE / ANSPRUCHSTELLER",`Name: ${s.customer.name}`,`Telefon: ${s.customer.phone}`,`E-Mail: ${s.customer.email}`,`Adresse: ${s.customer.address}`,"","FAHRZEUG",`Kennzeichen: ${s.vehicle.license_plate}`,`Fahrzeug: ${s.vehicle.vehicle}`,"","VERSAND",`Gutachten an Kunde: ${s.shipping_jobs.send_to_customer?"ja":"nein"}`,`Gutachten an Rechtsanwalt: ${s.shipping_jobs.send_to_lawyer?"ja":"nein"}`,`Gutachten an Versicherung: ${s.shipping_jobs.send_to_insurance?"ja":"nein"}`,`Gutachten an Werkstatt: ${s.shipping_jobs.send_to_repair_shop?"ja":"nein"}`,"","OFFENE ANGABEN",s.missing_fields.length?s.missing_fields.map(x=>`- ${x}`).join("\\n"):"Keine offensichtlichen offenen Angaben."].join("\\n")}async function handleCustomerSubmit(e){e.preventDefault();collectVisibleInputs();latestSummary=buildSummaryObject();renderThankYou(latestSummary);const file=createJsonFile();if(navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){try{await navigator.share({title:`Fallaufnahme ${latestSummary.meta.caseId}`,text:"Strukturiertes Datenpaket für den Gutachter.",files:[file]})}catch(e){}}}function renderThankYou(s){const mail=s.meta.inspectorEmail||"",subject=`Fallaufnahme ${s.meta.caseId}`,body=["Die Schadenaufnahme wurde ausgefüllt.","","In der echten Version wird das Datenpaket automatisch an den Gutachter übermittelt.","",buildTextSummary(s)].join("\\n");app.innerHTML=`<section class="success-page"><div class="success-mark">✓</div><p class="eyebrow">Angaben vorbereitet</p><h1>Vielen Dank.</h1><p class="lead small">Ihre Angaben wurden vorbereitet. In der echten Version werden diese automatisch an den Gutachter übermittelt.</p><section class="card"><h2>Demo-Hinweis</h2><p class="muted">GitHub Pages hat kein Backend. Deshalb kann diese Demo die JSON-Datei nicht automatisch im Hintergrund versenden.</p><div class="actions"><button class="primary" onclick="App.shareJsonFile()">Datenpaket teilen</button><button class="secondary" onclick="App.downloadJson()">JSON-Datei herunterladen</button><a class="btn secondary" href="mailto:${encodeURIComponent(mail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}">E-Mail an Gutachter öffnen</a></div></section></section>`}function safe(v){return String(v).replace(/[^a-zA-Z0-9._-]/g,"-")}function createJsonFile(){const blob=new Blob([JSON.stringify(latestSummary,null,2)],{type:"application/json"});return new File([blob],`fallaufnahme-${safe(latestSummary.meta.caseId||"fall")}.json`,{type:"application/json"})}async function shareJsonFile(){if(!latestSummary)return;const file=createJsonFile();if(navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){try{await navigator.share({title:`Fallaufnahme ${latestSummary.meta.caseId}`,text:"Strukturiertes Datenpaket für den Gutachter.",files:[file]})}catch(e){}}else{downloadJson();toastMsg("Teilen nicht unterstützt – Datei heruntergeladen")}}function downloadJson(){if(!latestSummary)return;const blob=new Blob([JSON.stringify(latestSummary,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`fallaufnahme-${safe(latestSummary.meta.caseId||"fall")}.json`;a.click();URL.revokeObjectURL(a.href)}function init(){const mode=qs("mode");if(mode==="customer")startCustomer();else if(location.hash==="#inspector")showInspector();else goHome()}window.addEventListener("popstate",init);return{init,goHome,showInspector,showDemoInfo,fillExample,generateIntakeLink,copyGeneratedLink,openCustomerDemo,nextStep,prevStep,handleConditionalChange,handleCustomerSubmit,shareJsonFile,downloadJson,toast:toastMsg}})();App.init();
-</script>
+  <script>
+    const App = (() => {
+      const app = document.getElementById("app");
+      const toast = document.getElementById("toast");
+
+      let generatedLink = "";
+      let currentStep = 0;
+      let customerData = {};
+      let latestSummary = null;
+
+      const steps = [
+        {
+          title: "Ihre Kontaktdaten",
+          fields: [
+            ["fullName", "Vollständiger Name", "text", "Max Müller"],
+            ["phone", "Telefonnummer", "tel", "+49 176 12345678"],
+            ["email", "E-Mail", "email", "max@example.de"],
+            ["address", "Adresse", "text", "Musterstraße 12, 10115 Berlin"]
+          ]
+        },
+        {
+          title: "Fahrzeug",
+          fields: [
+            ["licensePlate", "Kennzeichen", "text", "B AB 1234"],
+            ["vehicle", "Fahrzeug / Modell", "text", "BMW 320d"],
+            ["vehicleOwner", "Fahrzeughalter, falls abweichend", "text", ""]
+          ]
+        },
+        {
+          title: "Schadenfall",
+          fields: [
+            ["damageDate", "Schadentag", "date", ""],
+            ["damageLocation", "Schadenort / Unfallort", "text", "Berlin"],
+            ["damageType", "Schadenart", "select", ["Haftpflichtschaden", "Kaskoschaden", "Teilkasko / Hagel", "Parkschaden", "Unklar"]],
+            ["damageArea", "Schadenbereich", "select", ["vorne", "hinten", "links", "rechts", "vorne links", "vorne rechts", "hinten links", "hinten rechts", "rundum", "unklar"]],
+            ["shortDescription", "Kurze Beschreibung", "textarea", "Auffahrunfall, Schaden hinten am Stoßfänger."]
+          ]
+        },
+        {
+          title: "Unfallgegner",
+          fields: [
+            ["opponentKnown", "Ist ein Unfallgegner bekannt?", "select", ["Ja", "Nein", "Unklar"]],
+            ["opponentName", "Name Unfallgegner", "text", ""],
+            ["opponentPlate", "Kennzeichen Unfallgegner", "text", ""],
+            ["opponentInsurance", "Versicherung Unfallgegner", "text", ""],
+            ["insuranceClaimNo", "Schadennummer / Aktenzeichen Versicherung", "text", ""]
+          ]
+        },
+        {
+          title: "Anwalt und Werkstatt",
+          fields: [
+            ["lawyerKnown", "Ist ein Rechtsanwalt beteiligt?", "select", ["Ja", "Nein", "Noch nicht"]],
+            ["lawyerName", "Kanzlei / Rechtsanwalt", "text", ""],
+            ["lawyerEmail", "E-Mail Kanzlei", "email", ""],
+            ["repairShopKnown", "Gibt es eine Werkstatt?", "select", ["Ja", "Nein", "Noch offen"]],
+            ["repairShopName", "Werkstatt / Autohaus", "text", ""],
+            ["repairShopEmail", "E-Mail Werkstatt", "email", ""]
+          ]
+        },
+        {
+          title: "Wer soll das Gutachten erhalten?",
+          checkboxes: [
+            ["sendCustomer", "Ich selbst / Kunde"],
+            ["sendLawyer", "Rechtsanwalt"],
+            ["sendInsurance", "Versicherung"],
+            ["sendRepairShop", "Werkstatt"],
+            ["sendOther", "Sonstige Person"]
+          ],
+          fields: [
+            ["otherRecipient", "Sonstiger Empfänger", "text", ""],
+            ["notes", "Weitere Hinweise", "textarea", ""]
+          ]
+        },
+        {
+          title: "Prüfen und absenden",
+          review: true
+        }
+      ];
+
+      function qs(name) {
+        return new URL(window.location.href).searchParams.get(name) || "";
+      }
+
+      function esc(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      }
+
+      function attr(value) {
+        return esc(value).replaceAll("'", "&#039;");
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1800);
+      }
+
+      function goHome() {
+        history.pushState({}, "", location.pathname);
+
+        app.innerHTML = `
+          <section class="hero">
+            <div>
+              <p class="eyebrow">Mobile Fallaufnahme für Kfz-Gutachter</p>
+              <h1>Der Kunde füllt die Beteiligten ein. Der Gutachter erhält eine fertige Vorlage.</h1>
+              <p class="lead">
+                Senden Sie einen Aufnahme-Link per SMS oder E-Mail. Der Kunde ergänzt Anwalt,
+                Versicherung, Werkstatt und Versandwünsche. Sie erhalten alles strukturiert zurück.
+              </p>
+              <div class="actions">
+                <button class="primary" onclick="App.showInspector()">Fall anlegen</button>
+                <button class="secondary" onclick="App.openCustomerDemo()">Kundenansicht testen</button>
+              </div>
+            </div>
+
+            <div class="phone">
+              <div class="phone-card">
+                <div class="pill">Beispielausgabe</div>
+                <h3>Versandjobs vorbereitet</h3>
+                <div class="row ok"><span>✓</span> Gutachten an Kunde</div>
+                <div class="row ok"><span>✓</span> Gutachten an Anwalt</div>
+                <div class="row ok"><span>✓</span> Gutachten an Versicherung</div>
+                <div class="row warn"><span>!</span> Schadennummer noch offen</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid">
+            <article class="feature">
+              <div class="num">1</div>
+              <h3>Gutachter sendet Link</h3>
+              <p>Telefonnummer oder E-Mail eingeben, Fallreferenz eintragen, Link senden.</p>
+            </article>
+
+            <article class="feature">
+              <div class="num">2</div>
+              <h3>Kunde füllt aus</h3>
+              <p>Geführte Fragen zu Kunde, Fahrzeug, Unfallgegner, Versicherung, Anwalt und Werkstatt.</p>
+            </article>
+
+            <article class="feature">
+              <div class="num">3</div>
+              <h3>Strukturierte Rückgabe</h3>
+              <p>Versandvorschlag, offene Angaben und JSON-Datei für spätere Schnittstellen.</p>
+            </article>
+          </section>
+
+          <section class="card">
+            <h2>Demo-Ziel</h2>
+            <p class="muted">
+              Diese GitHub-Pages-Version ist zur optischen und funktionalen Validierung gedacht.
+              Sie speichert keine Daten auf einem Server.
+            </p>
+          </section>
+        `;
+      }
+
+      function showInspector() {
+        history.pushState({}, "", location.pathname + "#inspector");
+
+        app.innerHTML = `
+          <section class="page-head">
+            <button class="back" onclick="App.goHome()">← Zurück</button>
+            <p class="eyebrow">Gutachter-App</p>
+            <h1>Neuen Aufnahme-Link erstellen</h1>
+            <p class="lead small">
+              Für die Demo wird der Link lokal erzeugt. Versand erfolgt über SMS-/E-Mail-App des Handys.
+            </p>
+          </section>
+
+          <section class="card">
+            <div class="form-grid">
+              <label>
+                Interne Fallnummer / Schadennummer
+                <input id="caseId" placeholder="z. B. 2026-00123">
+              </label>
+
+              <label>
+                Kundenname optional
+                <input id="clientName" placeholder="z. B. Max Müller">
+              </label>
+
+              <label>
+                Telefonnummer für SMS
+                <input id="clientPhone" placeholder="z. B. +4917612345678" inputmode="tel">
+              </label>
+
+              <label>
+                E-Mail des Kunden
+                <input id="clientEmail" placeholder="kunde@example.de" inputmode="email">
+              </label>
+
+              <label>
+                Gutachter-E-Mail für Rückgabe
+                <input id="inspectorEmail" placeholder="gutachter@example.de" inputmode="email">
+              </label>
+
+              <label>
+                Büro / Gutachtername
+                <input id="officeName" placeholder="z. B. SV-Büro Gutachter">
+              </label>
+            </div>
+
+            <div class="actions" style="margin-top:18px">
+              <button class="primary" onclick="App.generateIntakeLink()">Aufnahme-Link erzeugen</button>
+              <button class="secondary" onclick="App.fillExample()">Beispiel füllen</button>
+            </div>
+          </section>
+
+          <section id="linkResult" class="card hidden" style="margin-top:18px">
+            <h2>Aufnahme-Link</h2>
+            <p class="muted">Diesen Link kann der Kunde öffnen.</p>
+            <div id="generatedLink" class="linkbox"></div>
+
+            <div class="actions" style="margin-top:14px">
+              <button class="secondary" onclick="App.copyGeneratedLink()">Link kopieren</button>
+              <a id="smsLink" class="btn secondary" href="#">Per SMS öffnen</a>
+              <a id="emailLink" class="btn primary" href="#">Per E-Mail öffnen</a>
+            </div>
+          </section>
+
+          <section class="card" style="margin-top:18px">
+            <h2>Demo-Fälle</h2>
+            <div id="caseList"></div>
+          </section>
+        `;
+
+        renderCaseList();
+      }
+
+      function showDemoInfo() {
+        alert(
+          "Demo-Hinweis:\\n\\n" +
+          "Diese GitHub-Pages-Version ist statisch. Sie kann Links erzeugen und SMS/E-Mail-Apps öffnen, " +
+          "aber keine Daten automatisch auf einem Server speichern.\\n\\n" +
+          "Für einen echten Pilotbetrieb braucht die App später ein Backend."
+        );
+      }
+
+      function fillExample() {
+        document.getElementById("caseId").value = "2026-00123";
+        document.getElementById("clientName").value = "Max Müller";
+        document.getElementById("clientPhone").value = "+4917612345678";
+        document.getElementById("clientEmail").value = "kunde@example.de";
+        document.getElementById("inspectorEmail").value = "gutachter@example.de";
+        document.getElementById("officeName").value = "SV-Büro Gutachter";
+      }
+
+      function generateIntakeLink() {
+        const caseId = document.getElementById("caseId").value.trim() || `FALL-${Date.now()}`;
+        const clientName = document.getElementById("clientName").value.trim();
+        const clientPhone = document.getElementById("clientPhone").value.trim();
+        const clientEmail = document.getElementById("clientEmail").value.trim();
+        const inspectorEmail = document.getElementById("inspectorEmail").value.trim();
+        const officeName = document.getElementById("officeName").value.trim();
+
+        const params = new URLSearchParams({
+          mode: "customer",
+          case: caseId,
+          inspector: inspectorEmail,
+          office: officeName
+        });
+
+        if (clientName) {
+          params.set("name", clientName);
+        }
+
+        generatedLink = `${location.origin}${location.pathname}?${params.toString()}`;
+
+        const msg =
+          `Bitte vervollständigen Sie Ihre Schadenfall-Daten für ${officeName || "den Gutachter"}.\\n\\n` +
+          `${generatedLink}\\n\\n` +
+          `Dauer: ca. 3–5 Minuten.`;
+
+        const subject = `Schadenaufnahme ${caseId}`;
+
+        document.getElementById("generatedLink").textContent = generatedLink;
+
+        document.getElementById("smsLink").href =
+          `sms:${encodeURIComponent(clientPhone)}?&body=${encodeURIComponent(msg)}`;
+
+        document.getElementById("emailLink").href =
+          `mailto:${encodeURIComponent(clientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
+
+        document.getElementById("linkResult").classList.remove("hidden");
+
+        const cases = JSON.parse(localStorage.getItem("gl_cases") || "[]");
+
+        cases.unshift({
+          caseId,
+          clientName,
+          createdAt: new Date().toISOString(),
+          link: generatedLink
+        });
+
+        localStorage.setItem("gl_cases", JSON.stringify(cases.slice(0, 10)));
+
+        renderCaseList();
+      }
+
+      async function copyGeneratedLink() {
+        if (!generatedLink) return;
+        await navigator.clipboard.writeText(generatedLink);
+        showToast("Link kopiert");
+      }
+
+      function renderCaseList() {
+        const el = document.getElementById("caseList");
+        if (!el) return;
+
+        const cases = JSON.parse(localStorage.getItem("gl_cases") || "[]");
+
+        if (!cases.length) {
+          el.innerHTML = '<p class="muted">Noch keine Demo-Fälle erstellt.</p>';
+          return;
+        }
+
+        el.innerHTML = cases.map(c => `
+          <div class="case-item">
+            <div>
+              <b>${esc(c.caseId)}</b><br>
+              <span class="muted">
+                ${esc(c.clientName || "ohne Name")} · ${new Date(c.createdAt).toLocaleString("de-DE")}
+              </span>
+            </div>
+            <button class="secondary small" onclick="navigator.clipboard.writeText('${attr(c.link)}'); App.toast('Link kopiert')">
+              Kopieren
+            </button>
+          </div>
+        `).join("");
+      }
+
+      function openCustomerDemo() {
+        const params = new URLSearchParams({
+          mode: "customer",
+          case: "DEMO-2026-001",
+          inspector: "gutachter@example.de",
+          office: "SV-Büro Gutachter"
+        });
+
+        history.pushState({}, "", `${location.pathname}?${params.toString()}`);
+
+        startCustomer();
+      }
+
+      function startCustomer() {
+        currentStep = 0;
+
+        customerData = {
+          meta: {
+            caseId: qs("case") || "DEMO",
+            inspectorEmail: qs("inspector"),
+            officeName: qs("office") || "SV-Büro Gutachter",
+            prefilledName: qs("name")
+          }
+        };
+
+        renderCustomerShell();
+        renderStep();
+      }
+
+      function renderCustomerShell() {
+        app.innerHTML = `
+          <section class="page-head">
+            <p class="eyebrow">Digitale Schadenaufnahme</p>
+            <h1>Angaben zum Schadenfall ergänzen</h1>
+            <p class="lead small">
+              Bitte füllen Sie die Angaben so gut wie möglich aus. Unbekannte Felder können frei bleiben.
+            </p>
+          </section>
+
+          <section class="card">
+            <div class="progress-top">
+              <b id="progressLabel"></b>
+              <span id="caseBadge" class="pill"></span>
+            </div>
+            <div class="progress"><div id="progressFill"></div></div>
+          </section>
+
+          <form id="customerForm" class="card" style="margin-top:18px" onsubmit="App.handleCustomerSubmit(event)">
+            <div id="stepContainer"></div>
+
+            <div class="nav">
+              <button type="button" class="secondary" id="prevBtn" onclick="App.prevStep()">Zurück</button>
+              <button type="button" class="primary" id="nextBtn" onclick="App.nextStep()">Weiter</button>
+              <button type="submit" class="primary hidden" id="submitBtn">Angaben absenden</button>
+            </div>
+          </form>
+        `;
+      }
+
+      function renderStep() {
+        const step = steps[currentStep];
+
+        document.getElementById("progressLabel").textContent =
+          `Schritt ${currentStep + 1} von ${steps.length}`;
+
+        document.getElementById("caseBadge").textContent =
+          customerData.meta.caseId;
+
+        document.getElementById("progressFill").style.width =
+          `${((currentStep + 1) / steps.length) * 100}%`;
+
+        let html = `<h2>${esc(step.title)}</h2>`;
+
+        if (step.review) {
+          collectVisibleInputs();
+          const summary = buildSummaryObject();
+          html += renderReview(summary);
+        } else {
+          if (step.checkboxes) {
+            html += `<div class="options">`;
+
+            for (const [name, label] of step.checkboxes) {
+              html += `
+                <label class="option">
+                  <input
+                    type="checkbox"
+                    data-field="${name}"
+                    ${customerData[name] ? "checked" : ""}
+                    onchange="App.handleConditionalChange()"
+                  >
+                  ${esc(label)}
+                </label>
+              `;
+            }
+
+            html += `</div><br>`;
+          }
+
+          for (const [name, label, type, placeholder] of (step.fields || [])) {
+            const hidden = getFieldVisibility(name).hidden ? " hidden" : "";
+
+            const value =
+              customerData[name] ||
+              (name === "fullName" && customerData.meta.prefilledName
+                ? customerData.meta.prefilledName
+                : "");
+
+            if (type === "select") {
+              html += `
+                <div class="field-wrap${hidden}" data-wrap="${name}">
+                  <label>
+                    ${esc(label)}
+                    <select data-field="${name}" onchange="App.handleConditionalChange()">
+                      <option value="">Bitte auswählen</option>
+              `;
+
+              for (const option of placeholder) {
+                html += `
+                  <option value="${attr(option)}" ${value === option ? "selected" : ""}>
+                    ${esc(option)}
+                  </option>
+                `;
+              }
+
+              html += `
+                    </select>
+                  </label>
+                </div>
+              `;
+            } else if (type === "textarea") {
+              html += `
+                <div class="field-wrap${hidden}" data-wrap="${name}">
+                  <label>
+                    ${esc(label)}
+                    <textarea
+                      data-field="${name}"
+                      placeholder="${attr(placeholder || "")}"
+                      oninput="App.handleConditionalChange()"
+                    >${esc(value)}</textarea>
+                  </label>
+                </div>
+              `;
+            } else {
+              html += `
+                <div class="field-wrap${hidden}" data-wrap="${name}">
+                  <label>
+                    ${esc(label)}
+                    <input
+                      data-field="${name}"
+                      type="${type}"
+                      value="${attr(value)}"
+                      placeholder="${attr(placeholder || "")}"
+                      oninput="App.handleConditionalChange()"
+                    >
+                  </label>
+                </div>
+              `;
+            }
+          }
+        }
+
+        document.getElementById("stepContainer").innerHTML = html;
+
+        document.getElementById("prevBtn").style.visibility =
+          currentStep === 0 ? "hidden" : "visible";
+
+        document.getElementById("nextBtn").classList.toggle(
+          "hidden",
+          currentStep === steps.length - 1
+        );
+
+        document.getElementById("submitBtn").classList.toggle(
+          "hidden",
+          currentStep !== steps.length - 1
+        );
+      }
+
+      function getFieldVisibility(name) {
+        if (["opponentName", "opponentPlate", "opponentInsurance", "insuranceClaimNo"].includes(name)) {
+          return { hidden: customerData.opponentKnown !== "Ja" };
+        }
+
+        if (["lawyerName", "lawyerEmail"].includes(name)) {
+          return { hidden: customerData.lawyerKnown !== "Ja" };
+        }
+
+        if (["repairShopName", "repairShopEmail"].includes(name)) {
+          return { hidden: customerData.repairShopKnown !== "Ja" };
+        }
+
+        if (name === "otherRecipient") {
+          return { hidden: !customerData.sendOther };
+        }
+
+        return { hidden: false };
+      }
+
+      function applyConditionalVisibility() {
+        document.querySelectorAll("[data-wrap]").forEach(wrap => {
+          wrap.classList.toggle(
+            "hidden",
+            getFieldVisibility(wrap.dataset.wrap).hidden
+          );
+        });
+      }
+
+      function handleConditionalChange() {
+        collectVisibleInputs();
+        applyConditionalVisibility();
+      }
+
+      function collectVisibleInputs() {
+        document.querySelectorAll("[data-field]").forEach(el => {
+          const name = el.dataset.field;
+          customerData[name] =
+            el.type === "checkbox" ? el.checked : el.value.trim();
+        });
+      }
+
+      function nextStep() {
+        collectVisibleInputs();
+
+        if (currentStep < steps.length - 1) {
+          currentStep++;
+          renderStep();
+        }
+      }
+
+      function prevStep() {
+        collectVisibleInputs();
+
+        if (currentStep > 0) {
+          currentStep--;
+          renderStep();
+        }
+      }
+
+      function renderReview(summary) {
+        const recipients = [];
+
+        if (summary.shipping_jobs.send_to_customer) recipients.push("Kunde");
+        if (summary.shipping_jobs.send_to_lawyer) recipients.push("Rechtsanwalt");
+        if (summary.shipping_jobs.send_to_insurance) recipients.push("Versicherung");
+        if (summary.shipping_jobs.send_to_repair_shop) recipients.push("Werkstatt");
+        if (summary.shipping_jobs.send_to_other) recipients.push(summary.shipping_jobs.other_recipient || "Sonstige Person");
+
+        return `
+          <p class="muted">
+            Bitte prüfen Sie kurz, ob Ihre Angaben vollständig sind.
+            Danach werden die Daten für den Gutachter vorbereitet.
+          </p>
+
+          <div class="review-card">
+            <h3>Ihre Angaben</h3>
+            <p><b>Name:</b> ${esc(summary.customer.name || "—")}</p>
+            <p><b>Fahrzeug:</b> ${esc(summary.vehicle.vehicle || "—")} · ${esc(summary.vehicle.license_plate || "—")}</p>
+            <p><b>Schaden:</b> ${esc(summary.damage.type || "—")} · ${esc(summary.damage.area || "—")}</p>
+
+            <h3>Gewünschte Empfänger</h3>
+            ${
+              recipients.length
+                ? `<div class="chips">${recipients.map(r => `<span class="chip">${esc(r)}</span>`).join("")}</div>`
+                : `<p class="muted">Keine Empfänger ausgewählt.</p>`
+            }
+
+            ${
+              summary.missing_fields.length
+                ? `<h3>Noch offene Angaben</h3><div class="chips">${summary.missing_fields.map(m => `<span class="chip warn">${esc(m)}</span>`).join("")}</div>`
+                : ""
+            }
+          </div>
+        `;
+      }
+
+      function buildSummaryObject() {
+        const d = customerData;
+        const missing = [];
+
+        const addMissing = (condition, label) => {
+          if (condition) missing.push(label);
+        };
+
+        addMissing(!d.fullName, "Kundenname");
+        addMissing(!d.phone && !d.email, "Telefonnummer oder E-Mail Kunde");
+        addMissing(!d.licensePlate, "Kennzeichen Kundenfahrzeug");
+        addMissing(d.opponentKnown === "Ja" && !d.opponentInsurance, "Versicherung Unfallgegner");
+        addMissing(d.lawyerKnown === "Ja" && !d.lawyerEmail, "E-Mail Rechtsanwalt");
+        addMissing(d.sendInsurance && !d.opponentInsurance, "Versand an Versicherung gewünscht, aber Versicherung fehlt");
+        addMissing(d.sendLawyer && !d.lawyerName, "Versand an Anwalt gewünscht, aber Kanzlei fehlt");
+        addMissing(d.sendRepairShop && !d.repairShopName, "Versand an Werkstatt gewünscht, aber Werkstatt fehlt");
+
+        return {
+          meta: d.meta,
+          customer: {
+            name: d.fullName || "",
+            phone: d.phone || "",
+            email: d.email || "",
+            address: d.address || ""
+          },
+          vehicle: {
+            license_plate: d.licensePlate || "",
+            vehicle: d.vehicle || "",
+            owner: d.vehicleOwner || ""
+          },
+          damage: {
+            date: d.damageDate || "",
+            location: d.damageLocation || "",
+            type: d.damageType || "",
+            area: d.damageArea || "",
+            short_description: d.shortDescription || ""
+          },
+          opponent: {
+            known: d.opponentKnown || "",
+            name: d.opponentName || "",
+            license_plate: d.opponentPlate || "",
+            insurance: d.opponentInsurance || "",
+            insurance_claim_no: d.insuranceClaimNo || ""
+          },
+          lawyer: {
+            known: d.lawyerKnown || "",
+            name: d.lawyerName || "",
+            email: d.lawyerEmail || ""
+          },
+          repair_shop: {
+            known: d.repairShopKnown || "",
+            name: d.repairShopName || "",
+            email: d.repairShopEmail || ""
+          },
+          shipping_jobs: {
+            send_to_customer: !!d.sendCustomer,
+            send_to_lawyer: !!d.sendLawyer,
+            send_to_insurance: !!d.sendInsurance,
+            send_to_repair_shop: !!d.sendRepairShop,
+            send_to_other: !!d.sendOther,
+            other_recipient: d.otherRecipient || ""
+          },
+          notes: d.notes || "",
+          missing_fields: missing,
+          created_at: new Date().toISOString()
+        };
+      }
+
+      function buildTextSummary(s) {
+        return [
+          "FALLAUFNAHME / VERSANDVORSCHLAG",
+          `Fallnummer: ${s.meta.caseId}`,
+          `Büro: ${s.meta.officeName || ""}`,
+          "",
+          "KUNDE / ANSPRUCHSTELLER",
+          `Name: ${s.customer.name}`,
+          `Telefon: ${s.customer.phone}`,
+          `E-Mail: ${s.customer.email}`,
+          `Adresse: ${s.customer.address}`,
+          "",
+          "FAHRZEUG",
+          `Kennzeichen: ${s.vehicle.license_plate}`,
+          `Fahrzeug: ${s.vehicle.vehicle}`,
+          `Halter abweichend: ${s.vehicle.owner}`,
+          "",
+          "VERSAND",
+          `Gutachten an Kunde: ${s.shipping_jobs.send_to_customer ? "ja" : "nein"}`,
+          `Gutachten an Rechtsanwalt: ${s.shipping_jobs.send_to_lawyer ? "ja" : "nein"}`,
+          `Gutachten an Versicherung: ${s.shipping_jobs.send_to_insurance ? "ja" : "nein"}`,
+          `Gutachten an Werkstatt: ${s.shipping_jobs.send_to_repair_shop ? "ja" : "nein"}`,
+          "",
+          "OFFENE ANGABEN",
+          s.missing_fields.length
+            ? s.missing_fields.map(x => `- ${x}`).join("\\n")
+            : "Keine offensichtlichen offenen Angaben."
+        ].join("\\n");
+      }
+
+      async function handleCustomerSubmit(event) {
+        event.preventDefault();
+
+        collectVisibleInputs();
+        latestSummary = buildSummaryObject();
+
+        renderThankYou(latestSummary);
+
+        const file = createJsonFile();
+
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+          try {
+            await navigator.share({
+              title: `Fallaufnahme ${latestSummary.meta.caseId}`,
+              text: "Strukturiertes Datenpaket für den Gutachter.",
+              files: [file]
+            });
+          } catch (e) {}
+        }
+      }
+
+      function renderThankYou(summary) {
+        const mail = summary.meta.inspectorEmail || "";
+        const subject = `Fallaufnahme ${summary.meta.caseId}`;
+
+        const body = [
+          "Die Schadenaufnahme wurde ausgefüllt.",
+          "",
+          "In der echten Version wird das Datenpaket automatisch an den Gutachter übermittelt.",
+          "",
+          buildTextSummary(summary)
+        ].join("\\n");
+
+        app.innerHTML = `
+          <section class="success-page">
+            <div class="success-mark">✓</div>
+            <p class="eyebrow">Angaben vorbereitet</p>
+            <h1>Vielen Dank.</h1>
+            <p class="lead small">
+              Ihre Angaben wurden vorbereitet. In der echten Version werden diese automatisch an den Gutachter übermittelt.
+            </p>
+
+            <section class="card">
+              <h2>Demo-Hinweis</h2>
+              <p class="muted">
+                GitHub Pages hat kein Backend. Deshalb kann diese Demo die JSON-Datei nicht automatisch im Hintergrund versenden.
+              </p>
+
+              <div class="actions">
+                <button class="primary" onclick="App.shareJsonFile()">Datenpaket teilen</button>
+                <button class="secondary" onclick="App.downloadJson()">JSON-Datei herunterladen</button>
+                <a
+                  class="btn secondary"
+                  href="mailto:${encodeURIComponent(mail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}"
+                >
+                  E-Mail an Gutachter öffnen
+                </a>
+              </div>
+            </section>
+          </section>
+        `;
+      }
+
+      function safeFileName(value) {
+        return String(value).replace(/[^a-zA-Z0-9._-]/g, "-");
+      }
+
+      function createJsonFile() {
+        const blob = new Blob(
+          [JSON.stringify(latestSummary, null, 2)],
+          { type: "application/json" }
+        );
+
+        return new File(
+          [blob],
+          `fallaufnahme-${safeFileName(latestSummary.meta.caseId || "fall")}.json`,
+          { type: "application/json" }
+        );
+      }
+
+      async function shareJsonFile() {
+        if (!latestSummary) return;
+
+        const file = createJsonFile();
+
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+          try {
+            await navigator.share({
+              title: `Fallaufnahme ${latestSummary.meta.caseId}`,
+              text: "Strukturiertes Datenpaket für den Gutachter.",
+              files: [file]
+            });
+          } catch (e) {}
+        } else {
+          downloadJson();
+          showToast("Teilen nicht unterstützt – Datei heruntergeladen");
+        }
+      }
+
+      function downloadJson() {
+        if (!latestSummary) return;
+
+        const blob = new Blob(
+          [JSON.stringify(latestSummary, null, 2)],
+          { type: "application/json" }
+        );
+
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `fallaufnahme-${safeFileName(latestSummary.meta.caseId || "fall")}.json`;
+        a.click();
+
+        URL.revokeObjectURL(a.href);
+      }
+
+      function init() {
+        const mode = qs("mode");
+
+        if (mode === "customer") {
+          startCustomer();
+        } else if (location.hash === "#inspector") {
+          showInspector();
+        } else {
+          goHome();
+        }
+      }
+
+      window.addEventListener("popstate", init);
+
+      return {
+        init,
+        goHome,
+        showInspector,
+        showDemoInfo,
+        fillExample,
+        generateIntakeLink,
+        copyGeneratedLink,
+        openCustomerDemo,
+        nextStep,
+        prevStep,
+        handleConditionalChange,
+        handleCustomerSubmit,
+        shareJsonFile,
+        downloadJson,
+        toast: showToast
+      };
+    })();
+
+    App.init();
+  </script>
 </body>
 </html>
