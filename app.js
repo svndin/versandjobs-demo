@@ -1,3 +1,4 @@
+
 const App = (() => {
   const app = document.getElementById("app");
   const toast = document.getElementById("toast");
@@ -70,15 +71,23 @@ const App = (() => {
         ["notes", "Weitere Hinweise", "textarea", ""]
       ]
     },
-    {
-      title: "Prüfen und absenden",
-      review: true
-    }
+    { title: "Prüfen und absenden", review: true }
   ];
 
-  function renderTemplate(id) {
-    app.innerHTML = document.getElementById(id).innerHTML;
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  function qs(name) {
+    return new URL(window.location.href).searchParams.get(name) || "";
+  }
+
+  function esc(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  function attr(value) {
+    return esc(value).replaceAll("'", "&#039;");
   }
 
   function showToast(message) {
@@ -87,35 +96,96 @@ const App = (() => {
     setTimeout(() => toast.classList.remove("show"), 1800);
   }
 
-  function qs(name) {
-    const url = new URL(window.location.href);
-    return url.searchParams.get(name) || "";
-  }
-
   function goHome() {
     history.pushState({}, "", location.pathname);
-    renderTemplate("home-template");
+    app.innerHTML = `
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Mobile Fallaufnahme für Kfz-Gutachter</p>
+          <h1>Der Kunde füllt die Beteiligten ein. Der Gutachter erhält eine fertige Vorlage.</h1>
+          <p class="lead">
+            Senden Sie einen Aufnahme-Link per SMS oder E-Mail. Der Kunde ergänzt Anwalt,
+            Versicherung, Werkstatt und Versandwünsche. Sie erhalten alles strukturiert zurück.
+          </p>
+          <div class="actions">
+            <button class="primary" onclick="App.showInspector()">Fall anlegen</button>
+            <button class="secondary" onclick="App.openCustomerDemo()">Kundenansicht testen</button>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="phone-card">
+            <div class="pill">Fall 2026-00123</div>
+            <h3>Versandvorschlag</h3>
+            <div class="row ok"><span>✓</span> Kunde</div>
+            <div class="row ok"><span>✓</span> Rechtsanwalt</div>
+            <div class="row ok"><span>✓</span> Versicherung</div>
+            <div class="row warn"><span>!</span> Schadennummer fehlt</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="feature"><div class="num">1</div><h3>Gutachter sendet Link</h3><p>Telefonnummer oder E-Mail eingeben, Fallreferenz eintragen, Link senden.</p></article>
+        <article class="feature"><div class="num">2</div><h3>Kunde füllt aus</h3><p>Geführte Fragen zu Kunde, Fahrzeug, Unfallgegner, Versicherung, Anwalt und Werkstatt.</p></article>
+        <article class="feature"><div class="num">3</div><h3>Strukturierte Rückgabe</h3><p>Versandvorschlag, offene Angaben und JSON-Datei für spätere Schnittstellen.</p></article>
+      </section>
+
+      <section class="card">
+        <h2>Demo-Ziel</h2>
+        <p class="muted">
+          Diese GitHub-Pages-Version ist nur zur optischen und funktionalen Validierung gedacht.
+          Sie speichert keine Daten auf einem Server.
+        </p>
+      </section>
+    `;
   }
 
   function showInspector() {
     history.pushState({}, "", location.pathname + "#inspector");
-    renderTemplate("inspector-template");
+    app.innerHTML = `
+      <section class="page-head">
+        <button class="back" onclick="App.goHome()">← Zurück</button>
+        <p class="eyebrow">Gutachter-App</p>
+        <h1>Neuen Aufnahme-Link erstellen</h1>
+        <p class="lead small">Für die Demo wird der Link lokal erzeugt. Versand erfolgt über SMS-/E-Mail-App des Handys.</p>
+      </section>
+
+      <section class="card">
+        <div class="form-grid">
+          <label>Interne Fallnummer / Schadennummer<input id="caseId" placeholder="z. B. 2026-00123"></label>
+          <label>Kundenname optional<input id="clientName" placeholder="z. B. Max Müller"></label>
+          <label>Telefonnummer für SMS<input id="clientPhone" placeholder="z. B. +4917612345678" inputmode="tel"></label>
+          <label>E-Mail des Kunden<input id="clientEmail" placeholder="kunde@example.de" inputmode="email"></label>
+          <label>Gutachter-E-Mail für Rückgabe<input id="inspectorEmail" placeholder="gutachter@example.de" inputmode="email"></label>
+          <label>Büro / Gutachtername<input id="officeName" placeholder="z. B. SV-Büro Gutachter"></label>
+        </div>
+        <div class="actions" style="margin-top:18px">
+          <button class="primary" onclick="App.generateIntakeLink()">Aufnahme-Link erzeugen</button>
+          <button class="secondary" onclick="App.fillExample()">Beispiel füllen</button>
+        </div>
+      </section>
+
+      <section id="linkResult" class="card hidden" style="margin-top:18px">
+        <h2>Aufnahme-Link</h2>
+        <p class="muted">Diesen Link kann der Kunde öffnen.</p>
+        <div id="generatedLink" class="linkbox"></div>
+        <div class="actions" style="margin-top:14px">
+          <button class="secondary" onclick="App.copyGeneratedLink()">Link kopieren</button>
+          <a id="smsLink" class="btn secondary" href="#">Per SMS öffnen</a>
+          <a id="emailLink" class="btn primary" href="#">Per E-Mail öffnen</a>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:18px">
+        <h2>Demo-Fälle</h2>
+        <div id="caseList"></div>
+      </section>
+    `;
     renderCaseList();
   }
 
-  function openCustomerDemo() {
-    const caseId = "DEMO-2026-001";
-    const email = "gutachter@example.de";
-    const office = "SV-Büro Gutachter";
-    const params = new URLSearchParams({ mode: "customer", case: caseId, inspector: email, office });
-    history.pushState({}, "", `${location.pathname}?${params.toString()}`);
-    startCustomer();
-  }
-
   function showDemoInfo() {
-    alert(
-      "Demo-Hinweis:\n\nDiese GitHub-Pages-Version ist statisch. Sie kann Links erzeugen und SMS/E-Mail-Apps öffnen, aber keine Daten automatisch auf einem Server speichern.\n\nFür einen echten Pilotbetrieb wäre ein Backend nötig."
-    );
+    alert("Demo-Hinweis:\\n\\nDiese GitHub-Pages-Version ist statisch. Sie kann Links erzeugen und SMS/E-Mail-Apps öffnen, aber keine Daten automatisch auf einem Server speichern.\\n\\nFür einen echten Pilotbetrieb braucht die App später ein Backend.");
   }
 
   function fillExample() {
@@ -144,22 +214,16 @@ const App = (() => {
     if (clientName) params.set("name", clientName);
 
     generatedLink = `${location.origin}${location.pathname}?${params.toString()}`;
-
-    const msg = `Bitte vervollständigen Sie Ihre Schadenfall-Daten für ${officeName || "den Gutachter"}.\n\n${generatedLink}\n\nDauer: ca. 3–5 Minuten.`;
+    const msg = `Bitte vervollständigen Sie Ihre Schadenfall-Daten für ${officeName || "den Gutachter"}.\\n\\n${generatedLink}\\n\\nDauer: ca. 3–5 Minuten.`;
     const subject = `Schadenaufnahme ${caseId}`;
 
     document.getElementById("generatedLink").textContent = generatedLink;
-
-    document.getElementById("smsLink").href =
-      `sms:${encodeURIComponent(clientPhone)}?&body=${encodeURIComponent(msg)}`;
-
-    document.getElementById("emailLink").href =
-      `mailto:${encodeURIComponent(clientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
-
+    document.getElementById("smsLink").href = `sms:${encodeURIComponent(clientPhone)}?&body=${encodeURIComponent(msg)}`;
+    document.getElementById("emailLink").href = `mailto:${encodeURIComponent(clientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
     document.getElementById("linkResult").classList.remove("hidden");
 
     const cases = JSON.parse(localStorage.getItem("gl_cases") || "[]");
-    cases.unshift({ caseId, clientName, clientPhone, clientEmail, inspectorEmail, officeName, createdAt: new Date().toISOString(), link: generatedLink });
+    cases.unshift({ caseId, clientName, createdAt: new Date().toISOString(), link: generatedLink });
     localStorage.setItem("gl_cases", JSON.stringify(cases.slice(0, 10)));
     renderCaseList();
   }
@@ -180,13 +244,21 @@ const App = (() => {
     }
     el.innerHTML = cases.map(c => `
       <div class="case-item">
-        <div>
-          <strong>${escapeHtml(c.caseId)}</strong><br/>
-          <span class="muted">${escapeHtml(c.clientName || "ohne Name")} · ${new Date(c.createdAt).toLocaleString("de-DE")}</span>
-        </div>
-        <button class="secondary small" onclick="navigator.clipboard.writeText('${escapeAttr(c.link)}'); App.toast('Link kopiert')">Kopieren</button>
+        <div><b>${esc(c.caseId)}</b><br><span class="muted">${esc(c.clientName || "ohne Name")} · ${new Date(c.createdAt).toLocaleString("de-DE")}</span></div>
+        <button class="secondary small" onclick="navigator.clipboard.writeText('${attr(c.link)}'); App.toast('Link kopiert')">Kopieren</button>
       </div>
     `).join("");
+  }
+
+  function openCustomerDemo() {
+    const params = new URLSearchParams({
+      mode: "customer",
+      case: "DEMO-2026-001",
+      inspector: "gutachter@example.de",
+      office: "SV-Büro Gutachter"
+    });
+    history.pushState({}, "", `${location.pathname}?${params.toString()}`);
+    startCustomer();
   }
 
   function startCustomer() {
@@ -199,8 +271,35 @@ const App = (() => {
         prefilledName: qs("name")
       }
     };
-    renderTemplate("customer-template");
+    renderCustomerShell();
     renderStep();
+  }
+
+  function renderCustomerShell() {
+    app.innerHTML = `
+      <section class="page-head">
+        <p class="eyebrow">Digitale Schadenaufnahme</p>
+        <h1>Angaben zum Schadenfall ergänzen</h1>
+        <p class="lead small">Bitte füllen Sie die Angaben so gut wie möglich aus. Unbekannte Felder können frei bleiben.</p>
+      </section>
+
+      <section class="card">
+        <div class="progress-top">
+          <b id="progressLabel"></b>
+          <span id="caseBadge" class="pill"></span>
+        </div>
+        <div class="progress"><div id="progressFill"></div></div>
+      </section>
+
+      <form id="customerForm" class="card" style="margin-top:18px" onsubmit="App.handleCustomerSubmit(event)">
+        <div id="stepContainer"></div>
+        <div class="nav">
+          <button type="button" class="secondary" id="prevBtn" onclick="App.prevStep()">Zurück</button>
+          <button type="button" class="primary" id="nextBtn" onclick="App.nextStep()">Weiter</button>
+          <button type="submit" class="primary hidden" id="submitBtn">Angaben absenden</button>
+        </div>
+      </form>
+    `;
   }
 
   function renderStep() {
@@ -209,117 +308,69 @@ const App = (() => {
     document.getElementById("caseBadge").textContent = customerData.meta.caseId;
     document.getElementById("progressFill").style.width = `${((currentStep + 1) / steps.length) * 100}%`;
 
-    const container = document.getElementById("stepContainer");
-    let html = `<h2>${step.title}</h2>`;
+    let html = `<h2>${esc(step.title)}</h2>`;
 
     if (step.review) {
       collectVisibleInputs();
       const summary = buildSummaryObject();
-      html += `
-        <p class="muted">
-          Bitte prüfen Sie kurz, ob Ihre Angaben vollständig sind. Nach dem Absenden werden die Daten
-          für den Gutachter als strukturiertes Datenpaket vorbereitet.
-        </p>
-        ${renderCustomerReview(summary)}
-      `;
+      html += renderReview(summary);
     } else {
       if (step.checkboxes) {
-        html += `<div class="option-grid">`;
+        html += `<div class="options">`;
         for (const [name, label] of step.checkboxes) {
-          const checked = customerData[name] ? "checked" : "";
           html += `
-            <label class="option-card">
-              <input type="checkbox" data-field="${name}" ${checked} onchange="App.handleConditionalChange()" />
-              ${label}
+            <label class="option">
+              <input type="checkbox" data-field="${name}" ${customerData[name] ? "checked" : ""} onchange="App.handleConditionalChange()">
+              ${esc(label)}
             </label>`;
         }
-        html += `</div><br/>`;
+        html += `</div><br>`;
       }
 
-      for (const field of step.fields || []) {
-        const [name, label, type, placeholder] = field;
-        const hiddenClass = getFieldVisibility(name).hidden ? " hidden" : "";
+      for (const [name, label, type, placeholder] of (step.fields || [])) {
+        const hidden = getFieldVisibility(name).hidden ? " hidden" : "";
         const value = customerData[name] || (name === "fullName" && customerData.meta.prefilledName ? customerData.meta.prefilledName : "");
 
-        if (type === "textarea") {
-          html += `<div class="field-wrap${hiddenClass}" data-wrap="${name}">
-            <label>${label}
-              <textarea data-field="${name}" placeholder="${escapeAttr(placeholder || "")}" oninput="App.handleConditionalChange()">${escapeHtml(value)}</textarea>
-            </label>
-          </div>`;
-        } else if (type === "select") {
-          html += `<div class="field-wrap${hiddenClass}" data-wrap="${name}">
-            <label>${label}
-              <select data-field="${name}" onchange="App.handleConditionalChange()">
-                <option value="">Bitte auswählen</option>`;
+        if (type === "select") {
+          html += `<div class="field-wrap${hidden}" data-wrap="${name}"><label>${esc(label)}<select data-field="${name}" onchange="App.handleConditionalChange()"><option value="">Bitte auswählen</option>`;
           for (const option of placeholder) {
-            const selected = value === option ? "selected" : "";
-            html += `<option ${selected} value="${escapeAttr(option)}">${escapeHtml(option)}</option>`;
+            html += `<option value="${attr(option)}" ${value === option ? "selected" : ""}>${esc(option)}</option>`;
           }
           html += `</select></label></div>`;
+        } else if (type === "textarea") {
+          html += `<div class="field-wrap${hidden}" data-wrap="${name}"><label>${esc(label)}<textarea data-field="${name}" placeholder="${attr(placeholder || "")}" oninput="App.handleConditionalChange()">${esc(value)}</textarea></label></div>`;
         } else {
-          html += `<div class="field-wrap${hiddenClass}" data-wrap="${name}">
-            <label>${label}
-              <input data-field="${name}" type="${type}" value="${escapeAttr(value)}" placeholder="${escapeAttr(placeholder || "")}" oninput="App.handleConditionalChange()" />
-            </label>
-          </div>`;
+          html += `<div class="field-wrap${hidden}" data-wrap="${name}"><label>${esc(label)}<input data-field="${name}" type="${type}" value="${attr(value)}" placeholder="${attr(placeholder || "")}" oninput="App.handleConditionalChange()"></label></div>`;
         }
       }
     }
 
-    container.innerHTML = html;
-
+    document.getElementById("stepContainer").innerHTML = html;
     document.getElementById("prevBtn").style.visibility = currentStep === 0 ? "hidden" : "visible";
     document.getElementById("nextBtn").classList.toggle("hidden", currentStep === steps.length - 1);
     document.getElementById("submitBtn").classList.toggle("hidden", currentStep !== steps.length - 1);
-
-    applyConditionalVisibility();
-  }
-
-  function renderCustomerReview(summary) {
-    const chips = [];
-    if (summary.shipping_jobs.send_to_customer) chips.push("Kunde");
-    if (summary.shipping_jobs.send_to_lawyer) chips.push("Rechtsanwalt");
-    if (summary.shipping_jobs.send_to_insurance) chips.push("Versicherung");
-    if (summary.shipping_jobs.send_to_repair_shop) chips.push("Werkstatt");
-    if (summary.shipping_jobs.send_to_other) chips.push(summary.shipping_jobs.other_recipient || "Sonstige Person");
-
-    return `
-      <div class="review-card">
-        <h3>Ihre Angaben</h3>
-        <p><strong>Name:</strong> ${escapeHtml(summary.customer.name || "—")}</p>
-        <p><strong>Fahrzeug:</strong> ${escapeHtml(summary.vehicle.vehicle || "—")} · ${escapeHtml(summary.vehicle.license_plate || "—")}</p>
-        <p><strong>Schaden:</strong> ${escapeHtml(summary.damage.type || "—")} · ${escapeHtml(summary.damage.area || "—")}</p>
-        <h3>Gewünschte Empfänger</h3>
-        ${chips.length ? `<div class="chip-list">${chips.map(c => `<span class="chip">${escapeHtml(c)}</span>`).join("")}</div>` : `<p class="muted">Keine Empfänger ausgewählt.</p>`}
-        ${summary.missing_fields.length ? `
-          <h3>Noch offene Angaben</h3>
-          <div class="chip-list">${summary.missing_fields.map(m => `<span class="chip warn">${escapeHtml(m)}</span>`).join("")}</div>
-        ` : ""}
-      </div>
-    `;
   }
 
   function getFieldVisibility(name) {
-    const d = customerData;
-
     if (["opponentName", "opponentPlate", "opponentInsurance", "insuranceClaimNo"].includes(name)) {
-      return { hidden: d.opponentKnown !== "Ja" };
+      return { hidden: customerData.opponentKnown !== "Ja" };
     }
-
     if (["lawyerName", "lawyerEmail"].includes(name)) {
-      return { hidden: d.lawyerKnown !== "Ja" };
+      return { hidden: customerData.lawyerKnown !== "Ja" };
     }
-
     if (["repairShopName", "repairShopEmail"].includes(name)) {
-      return { hidden: d.repairShopKnown !== "Ja" };
+      return { hidden: customerData.repairShopKnown !== "Ja" };
     }
-
     if (name === "otherRecipient") {
-      return { hidden: !d.sendOther };
+      return { hidden: !customerData.sendOther };
     }
-
     return { hidden: false };
+  }
+
+  function applyConditionalVisibility() {
+    document.querySelectorAll("[data-wrap]").forEach(wrap => {
+      wrap.classList.toggle("hidden", getFieldVisibility(wrap.dataset.wrap).hidden);
+    });
   }
 
   function handleConditionalChange() {
@@ -327,31 +378,17 @@ const App = (() => {
     applyConditionalVisibility();
   }
 
-  function applyConditionalVisibility() {
-    const wraps = document.querySelectorAll("[data-wrap]");
-    wraps.forEach(wrap => {
-      const name = wrap.getAttribute("data-wrap");
-      const shouldHide = getFieldVisibility(name).hidden;
-      wrap.classList.toggle("hidden", shouldHide);
-    });
-  }
-
   function collectVisibleInputs() {
-    const fields = document.querySelectorAll("[data-field]");
-    fields.forEach(el => {
-      const name = el.getAttribute("data-field");
-      if (el.type === "checkbox") {
-        customerData[name] = el.checked;
-      } else {
-        customerData[name] = el.value.trim();
-      }
+    document.querySelectorAll("[data-field]").forEach(el => {
+      const name = el.dataset.field;
+      customerData[name] = el.type === "checkbox" ? el.checked : el.value.trim();
     });
   }
 
   function nextStep() {
     collectVisibleInputs();
     if (currentStep < steps.length - 1) {
-      currentStep += 1;
+      currentStep++;
       renderStep();
     }
   }
@@ -359,78 +396,31 @@ const App = (() => {
   function prevStep() {
     collectVisibleInputs();
     if (currentStep > 0) {
-      currentStep -= 1;
+      currentStep--;
       renderStep();
     }
   }
 
-  async function handleCustomerSubmit(event) {
-    event.preventDefault();
-    collectVisibleInputs();
-    latestSummary = buildSummaryObject();
+  function renderReview(summary) {
+    const recipients = [];
+    if (summary.shipping_jobs.send_to_customer) recipients.push("Kunde");
+    if (summary.shipping_jobs.send_to_lawyer) recipients.push("Rechtsanwalt");
+    if (summary.shipping_jobs.send_to_insurance) recipients.push("Versicherung");
+    if (summary.shipping_jobs.send_to_repair_shop) recipients.push("Werkstatt");
+    if (summary.shipping_jobs.send_to_other) recipients.push(summary.shipping_jobs.other_recipient || "Sonstige Person");
 
-    const fileName = `fallaufnahme-${safeFileName(latestSummary.meta.caseId || "fall")}.json`;
-    const jsonBlob = new Blob([JSON.stringify(latestSummary, null, 2)], { type: "application/json" });
-    const jsonFile = new File([jsonBlob], fileName, { type: "application/json" });
-
-    renderThankYou(latestSummary);
-
-    // Try native file sharing on supported phones. This does not expose JSON as code to the customer.
-    if (navigator.canShare && navigator.canShare({ files: [jsonFile] }) && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Fallaufnahme ${latestSummary.meta.caseId}`,
-          text: "Strukturiertes Datenpaket für den Gutachter.",
-          files: [jsonFile]
-        });
-        showToast("Datenpaket geteilt");
-      } catch (e) {
-        // User cancelled sharing. Keep thank-you page with fallback buttons.
-      }
-    }
-  }
-
-  function renderThankYou(summary) {
-    app.innerHTML = `
-      <section class="success-page">
-        <div class="success-mark">✓</div>
-        <p class="eyebrow">Angaben vorbereitet</p>
-        <h1>Vielen Dank.</h1>
-        <p class="lead small-lead">
-          Ihre Angaben wurden als strukturiertes Datenpaket vorbereitet.
-          In der echten Version werden diese automatisch an den Gutachter übermittelt.
-        </p>
-
-        <section class="card">
-          <h2>Nächster Schritt in dieser Demo</h2>
-          <p class="muted">
-            Da GitHub Pages keine Server-Funktion hat, kann diese Demo die Datei nicht automatisch im Hintergrund versenden.
-            Sie können das Datenpaket aber als Datei teilen oder herunterladen.
-          </p>
-          <div class="actions wrap">
-            <button class="primary" onclick="App.shareJsonFile()">Datenpaket teilen</button>
-            <button class="secondary" onclick="App.downloadJson()">JSON-Datei herunterladen</button>
-            <a id="fallbackEmail" class="button secondary" href="#">E-Mail an Gutachter öffnen</a>
-          </div>
-        </section>
-      </section>
+    return `
+      <p class="muted">Bitte prüfen Sie kurz, ob Ihre Angaben vollständig sind. Danach werden die Daten für den Gutachter vorbereitet.</p>
+      <div class="review-card">
+        <h3>Ihre Angaben</h3>
+        <p><b>Name:</b> ${esc(summary.customer.name || "—")}</p>
+        <p><b>Fahrzeug:</b> ${esc(summary.vehicle.vehicle || "—")} · ${esc(summary.vehicle.license_plate || "—")}</p>
+        <p><b>Schaden:</b> ${esc(summary.damage.type || "—")} · ${esc(summary.damage.area || "—")}</p>
+        <h3>Gewünschte Empfänger</h3>
+        ${recipients.length ? `<div class="chips">${recipients.map(r => `<span class="chip">${esc(r)}</span>`).join("")}</div>` : `<p class="muted">Keine Empfänger ausgewählt.</p>`}
+        ${summary.missing_fields.length ? `<h3>Noch offene Angaben</h3><div class="chips">${summary.missing_fields.map(m => `<span class="chip warn">${esc(m)}</span>`).join("")}</div>` : ""}
+      </div>
     `;
-
-    const mail = summary.meta.inspectorEmail || "";
-    const subject = `Fallaufnahme ${summary.meta.caseId}`;
-    const body = [
-      "Die Schadenaufnahme wurde ausgefüllt.",
-      "",
-      "Hinweis: In der Demo wird das strukturierte Datenpaket als JSON-Datei vorbereitet.",
-      "Für die echte Version wird die Datei automatisch an den Gutachter übermittelt.",
-      "",
-      buildTextSummary(summary)
-    ].join("\n");
-
-    const fallback = document.getElementById("fallbackEmail");
-    if (fallback) {
-      fallback.href = `mailto:${encodeURIComponent(mail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
   }
 
   function buildSummaryObject() {
@@ -449,41 +439,12 @@ const App = (() => {
 
     return {
       meta: d.meta,
-      customer: {
-        name: d.fullName || "",
-        phone: d.phone || "",
-        email: d.email || "",
-        address: d.address || ""
-      },
-      vehicle: {
-        license_plate: d.licensePlate || "",
-        vehicle: d.vehicle || "",
-        owner: d.vehicleOwner || ""
-      },
-      damage: {
-        date: d.damageDate || "",
-        location: d.damageLocation || "",
-        type: d.damageType || "",
-        area: d.damageArea || "",
-        short_description: d.shortDescription || ""
-      },
-      opponent: {
-        known: d.opponentKnown || "",
-        name: d.opponentName || "",
-        license_plate: d.opponentPlate || "",
-        insurance: d.opponentInsurance || "",
-        insurance_claim_no: d.insuranceClaimNo || ""
-      },
-      lawyer: {
-        known: d.lawyerKnown || "",
-        name: d.lawyerName || "",
-        email: d.lawyerEmail || ""
-      },
-      repair_shop: {
-        known: d.repairShopKnown || "",
-        name: d.repairShopName || "",
-        email: d.repairShopEmail || ""
-      },
+      customer: { name: d.fullName || "", phone: d.phone || "", email: d.email || "", address: d.address || "" },
+      vehicle: { license_plate: d.licensePlate || "", vehicle: d.vehicle || "", owner: d.vehicleOwner || "" },
+      damage: { date: d.damageDate || "", location: d.damageLocation || "", type: d.damageType || "", area: d.damageArea || "", short_description: d.shortDescription || "" },
+      opponent: { known: d.opponentKnown || "", name: d.opponentName || "", license_plate: d.opponentPlate || "", insurance: d.opponentInsurance || "", insurance_claim_no: d.insuranceClaimNo || "" },
+      lawyer: { known: d.lawyerKnown || "", name: d.lawyerName || "", email: d.lawyerEmail || "" },
+      repair_shop: { known: d.repairShopKnown || "", name: d.repairShopName || "", email: d.repairShopEmail || "" },
       shipping_jobs: {
         send_to_customer: !!d.sendCustomer,
         send_to_lawyer: !!d.sendLawyer,
@@ -500,77 +461,99 @@ const App = (() => {
 
   function buildTextSummary(s) {
     return [
-      `FALLAUFNAHME / VERSANDVORSCHLAG`,
+      "FALLAUFNAHME / VERSANDVORSCHLAG",
       `Fallnummer: ${s.meta.caseId}`,
       `Büro: ${s.meta.officeName || ""}`,
-      ``,
-      `KUNDE / ANSPRUCHSTELLER`,
+      "",
+      "KUNDE / ANSPRUCHSTELLER",
       `Name: ${s.customer.name}`,
       `Telefon: ${s.customer.phone}`,
       `E-Mail: ${s.customer.email}`,
       `Adresse: ${s.customer.address}`,
-      ``,
-      `FAHRZEUG`,
+      "",
+      "FAHRZEUG",
       `Kennzeichen: ${s.vehicle.license_plate}`,
       `Fahrzeug: ${s.vehicle.vehicle}`,
       `Halter abweichend: ${s.vehicle.owner}`,
-      ``,
-      `SCHADEN`,
-      `Schadentag: ${s.damage.date}`,
-      `Schadenort: ${s.damage.location}`,
-      `Schadenart: ${s.damage.type}`,
-      `Schadenbereich: ${s.damage.area}`,
-      `Beschreibung: ${s.damage.short_description}`,
-      ``,
-      `UNFALLGEGNER / VERSICHERUNG`,
-      `Unfallgegner bekannt: ${s.opponent.known}`,
-      `Name: ${s.opponent.name}`,
-      `Kennzeichen: ${s.opponent.license_plate}`,
-      `Versicherung: ${s.opponent.insurance}`,
-      `Schadennummer / Aktenzeichen: ${s.opponent.insurance_claim_no}`,
-      ``,
-      `RECHTSANWALT`,
-      `Beteiligt: ${s.lawyer.known}`,
-      `Kanzlei: ${s.lawyer.name}`,
-      `E-Mail: ${s.lawyer.email}`,
-      ``,
-      `WERKSTATT`,
-      `Vorhanden: ${s.repair_shop.known}`,
-      `Name: ${s.repair_shop.name}`,
-      `E-Mail: ${s.repair_shop.email}`,
-      ``,
-      `VERSAND`,
-      `Gutachten an Kunde: ${yesNo(s.shipping_jobs.send_to_customer)}`,
-      `Gutachten an Rechtsanwalt: ${yesNo(s.shipping_jobs.send_to_lawyer)}`,
-      `Gutachten an Versicherung: ${yesNo(s.shipping_jobs.send_to_insurance)}`,
-      `Gutachten an Werkstatt: ${yesNo(s.shipping_jobs.send_to_repair_shop)}`,
-      `Sonstige: ${s.shipping_jobs.other_recipient}`,
-      ``,
-      `WEITERE HINWEISE`,
-      `${s.notes}`,
-      ``,
-      `OFFENE ANGABEN`,
-      s.missing_fields.length ? s.missing_fields.map(x => `- ${x}`).join("\n") : "Keine offensichtlichen offenen Angaben."
-    ].join("\n");
+      "",
+      "VERSAND",
+      `Gutachten an Kunde: ${s.shipping_jobs.send_to_customer ? "ja" : "nein"}`,
+      `Gutachten an Rechtsanwalt: ${s.shipping_jobs.send_to_lawyer ? "ja" : "nein"}`,
+      `Gutachten an Versicherung: ${s.shipping_jobs.send_to_insurance ? "ja" : "nein"}`,
+      `Gutachten an Werkstatt: ${s.shipping_jobs.send_to_repair_shop ? "ja" : "nein"}`,
+      "",
+      "OFFENE ANGABEN",
+      s.missing_fields.length ? s.missing_fields.map(x => `- ${x}`).join("\\n") : "Keine offensichtlichen offenen Angaben."
+    ].join("\\n");
   }
 
-  async function shareJsonFile() {
-    if (!latestSummary) return;
-    const fileName = `fallaufnahme-${safeFileName(latestSummary.meta.caseId || "fall")}.json`;
-    const jsonBlob = new Blob([JSON.stringify(latestSummary, null, 2)], { type: "application/json" });
-    const jsonFile = new File([jsonBlob], fileName, { type: "application/json" });
+  async function handleCustomerSubmit(event) {
+    event.preventDefault();
+    collectVisibleInputs();
+    latestSummary = buildSummaryObject();
+    renderThankYou(latestSummary);
 
-    if (navigator.canShare && navigator.canShare({ files: [jsonFile] }) && navigator.share) {
+    const file = createJsonFile();
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
       try {
         await navigator.share({
           title: `Fallaufnahme ${latestSummary.meta.caseId}`,
           text: "Strukturiertes Datenpaket für den Gutachter.",
-          files: [jsonFile]
+          files: [file]
         });
+      } catch (e) {}
+    }
+  }
+
+  function renderThankYou(summary) {
+    const mail = summary.meta.inspectorEmail || "";
+    const subject = `Fallaufnahme ${summary.meta.caseId}`;
+    const body = [
+      "Die Schadenaufnahme wurde ausgefüllt.",
+      "",
+      "In der echten Version wird das Datenpaket automatisch an den Gutachter übermittelt.",
+      "",
+      buildTextSummary(summary)
+    ].join("\\n");
+
+    app.innerHTML = `
+      <section class="success-page">
+        <div class="success-mark">✓</div>
+        <p class="eyebrow">Angaben vorbereitet</p>
+        <h1>Vielen Dank.</h1>
+        <p class="lead small">Ihre Angaben wurden vorbereitet. In der echten Version werden diese automatisch an den Gutachter übermittelt.</p>
+        <section class="card">
+          <h2>Demo-Hinweis</h2>
+          <p class="muted">GitHub Pages hat kein Backend. Deshalb kann diese Demo die JSON-Datei nicht automatisch im Hintergrund versenden.</p>
+          <div class="actions">
+            <button class="primary" onclick="App.shareJsonFile()">Datenpaket teilen</button>
+            <button class="secondary" onclick="App.downloadJson()">JSON-Datei herunterladen</button>
+            <a class="btn secondary" href="mailto:${encodeURIComponent(mail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}">E-Mail an Gutachter öffnen</a>
+          </div>
+        </section>
+      </section>
+    `;
+  }
+
+  function safeFileName(value) {
+    return String(value).replace(/[^a-zA-Z0-9._-]/g, "-");
+  }
+
+  function createJsonFile() {
+    const blob = new Blob([JSON.stringify(latestSummary, null, 2)], { type: "application/json" });
+    return new File([blob], `fallaufnahme-${safeFileName(latestSummary.meta.caseId || "fall")}.json`, { type: "application/json" });
+  }
+
+  async function shareJsonFile() {
+    if (!latestSummary) return;
+    const file = createJsonFile();
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      try {
+        await navigator.share({ title: `Fallaufnahme ${latestSummary.meta.caseId}`, text: "Strukturiertes Datenpaket für den Gutachter.", files: [file] });
       } catch (e) {}
     } else {
       downloadJson();
-      showToast("Teilen wird nicht unterstützt – Datei wurde heruntergeladen");
+      showToast("Teilen nicht unterstützt – Datei heruntergeladen");
     }
   }
 
@@ -584,26 +567,6 @@ const App = (() => {
     URL.revokeObjectURL(a.href);
   }
 
-  function yesNo(value) {
-    return value ? "ja" : "nein";
-  }
-
-  function safeFileName(value) {
-    return String(value).replace(/[^a-zA-Z0-9._-]/g, "-");
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;");
-  }
-
-  function escapeAttr(value) {
-    return escapeHtml(value).replaceAll("'", "&#039;");
-  }
-
   function init() {
     const mode = qs("mode");
     if (mode === "customer") startCustomer();
@@ -614,21 +577,9 @@ const App = (() => {
   window.addEventListener("popstate", init);
 
   return {
-    init,
-    goHome,
-    showInspector,
-    showDemoInfo,
-    fillExample,
-    generateIntakeLink,
-    copyGeneratedLink,
-    openCustomerDemo,
-    nextStep,
-    prevStep,
-    handleCustomerSubmit,
-    handleConditionalChange,
-    shareJsonFile,
-    downloadJson,
-    toast: showToast
+    init, goHome, showInspector, showDemoInfo, fillExample, generateIntakeLink,
+    copyGeneratedLink, openCustomerDemo, nextStep, prevStep, handleConditionalChange,
+    handleCustomerSubmit, shareJsonFile, downloadJson, toast: showToast
   };
 })();
 

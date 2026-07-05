@@ -1,14 +1,11 @@
-# Datenschutz-Hinweis für die Demo
+# Datenschutz-Demo-Hinweis
 
-Diese GitHub-Pages-Demo speichert keine Daten auf einem Server. Die eingegebenen Daten werden im Browser verarbeitet.
+Diese GitHub-Pages-Demo speichert keine Daten auf einem Server.
 
-Für einen echten Pilotbetrieb sollten umgesetzt werden:
-
+Für einen echten Pilotbetrieb braucht man später:
 - Gutachter-Login
 - fallbezogene Links mit Ablaufdatum
 - verschlüsselte Speicherung
-- Datenlöschung nach Übernahme
-- AV-Vertrag
+- Löschkonzept
 - EU-Hosting
-- Zugriffprotokolle
-- Datenschutzhinweis vor Formularstart
+- AV-Vertrag
