@@ -1,11 +1,13 @@
 const App = (() => {
   const app = document.getElementById("app");
   const toast = document.getElementById("toast");
+  const LINE_BREAK = String.fromCharCode(13, 10);
 
   let generatedLink = "";
   let currentStep = 0;
   let customerData = {};
   let latestSummary = null;
+  let latestMailBody = "";
 
   const steps = [
     {
@@ -92,6 +94,11 @@ const App = (() => {
     return esc(value).replaceAll("'", "&#039;");
   }
 
+  function valueOrDash(value) {
+    const text = String(value ?? "").trim();
+    return text || "—";
+  }
+
   function showToast(message) {
     toast.textContent = message;
     toast.classList.add("show");
@@ -144,7 +151,7 @@ const App = (() => {
         <article class="feature">
           <div class="num">3</div>
           <h3>Strukturierte Rückgabe</h3>
-          <p>Versandvorschlag, offene Angaben und JSON-Datei für spätere Schnittstellen.</p>
+          <p>Alle ausgefüllten Angaben werden als Mail-Text und JSON-Datei vorbereitet.</p>
         </article>
       </section>
 
@@ -209,12 +216,13 @@ const App = (() => {
   }
 
   function showDemoInfo() {
-    alert(
-      "Demo-Hinweis:\n\n" +
-      "Diese GitHub-Pages-Version ist statisch. Sie kann Links erzeugen und SMS/E-Mail-Apps öffnen, " +
-      "aber keine Daten automatisch auf einem Server speichern.\n\n" +
+    alert([
+      "Demo-Hinweis:",
+      "",
+      "Diese GitHub-Pages-Version ist statisch. Sie kann Links erzeugen und SMS/E-Mail-Apps öffnen, aber keine Daten automatisch auf einem Server speichern.",
+      "",
       "Für einen echten Pilotbetrieb braucht die App später ein Backend."
-    );
+    ].join(LINE_BREAK));
   }
 
   function fillExample() {
@@ -247,10 +255,13 @@ const App = (() => {
 
     generatedLink = `${location.origin}${location.pathname}?${params.toString()}`;
 
-    const msg =
-      `Bitte vervollständigen Sie Ihre Schadenfall-Daten für ${officeName || "den Gutachter"}.\n\n` +
-      `${generatedLink}\n\n` +
-      `Dauer: ca. 3–5 Minuten.`;
+    const msg = [
+      `Bitte vervollständigen Sie Ihre Schadenfall-Daten für ${officeName || "den Gutachter"}.`,
+      "",
+      generatedLink,
+      "",
+      "Dauer: ca. 3–5 Minuten."
+    ].join(LINE_BREAK);
 
     const subject = `Schadenaufnahme ${caseId}`;
 
@@ -530,7 +541,7 @@ const App = (() => {
     return `
       <p class="muted">
         Bitte prüfen Sie kurz, ob Ihre Angaben vollständig sind.
-        Danach werden die Daten für den Gutachter vorbereitet.
+        Danach werden alle ausgefüllten Angaben für den Gutachter vorbereitet.
       </p>
 
       <div class="review-card">
@@ -538,6 +549,9 @@ const App = (() => {
         <p><b>Name:</b> ${esc(summary.customer.name || "—")}</p>
         <p><b>Fahrzeug:</b> ${esc(summary.vehicle.vehicle || "—")} · ${esc(summary.vehicle.license_plate || "—")}</p>
         <p><b>Schaden:</b> ${esc(summary.damage.type || "—")} · ${esc(summary.damage.area || "—")}</p>
+        <p><b>Gegnerische Versicherung:</b> ${esc(summary.opponent.insurance || "—")}</p>
+        <p><b>Anwalt:</b> ${esc(summary.lawyer.name || "—")}</p>
+        <p><b>Werkstatt:</b> ${esc(summary.repair_shop.name || "—")}</p>
 
         <h3>Gewünschte Empfänger</h3>
         ${
@@ -623,34 +637,78 @@ const App = (() => {
     };
   }
 
+  function yesNo(value) {
+    return value ? "ja" : "nein";
+  }
+
   function buildTextSummary(s) {
     return [
       "FALLAUFNAHME / VERSANDVORSCHLAG",
-      `Fallnummer: ${s.meta.caseId}`,
-      `Büro: ${s.meta.officeName || ""}`,
+      "Fallnummer: " + valueOrDash(s.meta.caseId),
+      "Büro: " + valueOrDash(s.meta.officeName),
+      "Erstellt am: " + new Date(s.created_at).toLocaleString("de-DE"),
       "",
       "KUNDE / ANSPRUCHSTELLER",
-      `Name: ${s.customer.name}`,
-      `Telefon: ${s.customer.phone}`,
-      `E-Mail: ${s.customer.email}`,
-      `Adresse: ${s.customer.address}`,
+      "Name: " + valueOrDash(s.customer.name),
+      "Telefon: " + valueOrDash(s.customer.phone),
+      "E-Mail: " + valueOrDash(s.customer.email),
+      "Adresse: " + valueOrDash(s.customer.address),
       "",
       "FAHRZEUG",
-      `Kennzeichen: ${s.vehicle.license_plate}`,
-      `Fahrzeug: ${s.vehicle.vehicle}`,
-      `Halter abweichend: ${s.vehicle.owner}`,
+      "Kennzeichen: " + valueOrDash(s.vehicle.license_plate),
+      "Fahrzeug / Modell: " + valueOrDash(s.vehicle.vehicle),
+      "Halter abweichend: " + valueOrDash(s.vehicle.owner),
       "",
-      "VERSAND",
-      `Gutachten an Kunde: ${s.shipping_jobs.send_to_customer ? "ja" : "nein"}`,
-      `Gutachten an Rechtsanwalt: ${s.shipping_jobs.send_to_lawyer ? "ja" : "nein"}`,
-      `Gutachten an Versicherung: ${s.shipping_jobs.send_to_insurance ? "ja" : "nein"}`,
-      `Gutachten an Werkstatt: ${s.shipping_jobs.send_to_repair_shop ? "ja" : "nein"}`,
+      "SCHADENFALL",
+      "Schadentag: " + valueOrDash(s.damage.date),
+      "Schadenort / Unfallort: " + valueOrDash(s.damage.location),
+      "Schadenart: " + valueOrDash(s.damage.type),
+      "Schadenbereich: " + valueOrDash(s.damage.area),
+      "Kurzbeschreibung: " + valueOrDash(s.damage.short_description),
+      "",
+      "UNFALLGEGNER / GEGNERISCHE VERSICHERUNG",
+      "Unfallgegner bekannt: " + valueOrDash(s.opponent.known),
+      "Name Unfallgegner: " + valueOrDash(s.opponent.name),
+      "Kennzeichen Unfallgegner: " + valueOrDash(s.opponent.license_plate),
+      "Gegnerische Versicherung: " + valueOrDash(s.opponent.insurance),
+      "Schadennummer / Aktenzeichen Versicherung: " + valueOrDash(s.opponent.insurance_claim_no),
+      "",
+      "RECHTSANWALT",
+      "Rechtsanwalt beteiligt: " + valueOrDash(s.lawyer.known),
+      "Kanzlei / Rechtsanwalt: " + valueOrDash(s.lawyer.name),
+      "E-Mail Kanzlei: " + valueOrDash(s.lawyer.email),
+      "",
+      "WERKSTATT",
+      "Werkstatt vorhanden: " + valueOrDash(s.repair_shop.known),
+      "Werkstatt / Autohaus: " + valueOrDash(s.repair_shop.name),
+      "E-Mail Werkstatt: " + valueOrDash(s.repair_shop.email),
+      "",
+      "VERSANDWÜNSCHE",
+      "Gutachten an Kunde: " + yesNo(s.shipping_jobs.send_to_customer),
+      "Gutachten an Rechtsanwalt: " + yesNo(s.shipping_jobs.send_to_lawyer),
+      "Gutachten an Versicherung: " + yesNo(s.shipping_jobs.send_to_insurance),
+      "Gutachten an Werkstatt: " + yesNo(s.shipping_jobs.send_to_repair_shop),
+      "Sonstiger Empfänger gewünscht: " + yesNo(s.shipping_jobs.send_to_other),
+      "Sonstiger Empfänger: " + valueOrDash(s.shipping_jobs.other_recipient),
+      "",
+      "WEITERE HINWEISE",
+      valueOrDash(s.notes),
       "",
       "OFFENE ANGABEN",
       s.missing_fields.length
-        ? s.missing_fields.map(x => `- ${x}`).join("\n")
+        ? s.missing_fields.map(item => "- " + item).join(LINE_BREAK)
         : "Keine offensichtlichen offenen Angaben."
-    ].join("\n");
+    ].join(LINE_BREAK);
+  }
+
+  function buildMailBody(summary) {
+    return [
+      "Die Schadenaufnahme wurde ausgefüllt.",
+      "",
+      "Alle vom Kunden eingegebenen Angaben stehen unten.",
+      "",
+      buildTextSummary(summary)
+    ].join(LINE_BREAK);
   }
 
   async function handleCustomerSubmit(event) {
@@ -658,33 +716,15 @@ const App = (() => {
 
     collectVisibleInputs();
     latestSummary = buildSummaryObject();
+    latestMailBody = buildMailBody(latestSummary);
 
     renderThankYou(latestSummary);
-
-    const file = createJsonFile();
-
-    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Fallaufnahme ${latestSummary.meta.caseId}`,
-          text: "Strukturiertes Datenpaket für den Gutachter.",
-          files: [file]
-        });
-      } catch (e) {}
-    }
   }
 
   function renderThankYou(summary) {
     const mail = summary.meta.inspectorEmail || "";
     const subject = `Fallaufnahme ${summary.meta.caseId}`;
-
-    const body = [
-      "Die Schadenaufnahme wurde ausgefüllt.",
-      "",
-      "In der echten Version wird das Datenpaket automatisch an den Gutachter übermittelt.",
-      "",
-      buildTextSummary(summary)
-    ].join("\n");
+    const body = latestMailBody || buildMailBody(summary);
 
     app.innerHTML = `
       <section class="success-page">
@@ -698,22 +738,32 @@ const App = (() => {
         <section class="card">
           <h2>Demo-Hinweis</h2>
           <p class="muted">
-            GitHub Pages hat kein Backend. Deshalb kann diese Demo die JSON-Datei nicht automatisch im Hintergrund versenden.
+            GitHub Pages hat kein Backend. Deshalb kann diese Demo die Daten nicht automatisch im Hintergrund versenden.
+            Die E-Mail enthält jetzt alle ausgefüllten Angaben.
           </p>
 
           <div class="actions">
-            <button class="primary" onclick="App.shareJsonFile()">Datenpaket teilen</button>
-            <button class="secondary" onclick="App.downloadJson()">JSON-Datei herunterladen</button>
             <a
-              class="btn secondary"
+              class="btn primary"
               href="mailto:${encodeURIComponent(mail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}"
             >
               E-Mail an Gutachter öffnen
             </a>
+            <button class="secondary" onclick="App.copyTextSummary()">Zusammenfassung kopieren</button>
+            <button class="secondary" onclick="App.downloadJson()">JSON-Datei herunterladen</button>
+            <button class="secondary" onclick="App.shareJsonFile()">JSON-Datei teilen</button>
           </div>
         </section>
       </section>
     `;
+  }
+
+  async function copyTextSummary() {
+    const text = latestMailBody || (latestSummary ? buildMailBody(latestSummary) : "");
+    if (!text) return;
+
+    await navigator.clipboard.writeText(text);
+    showToast("Zusammenfassung kopiert");
   }
 
   function safeFileName(value) {
@@ -795,6 +845,7 @@ const App = (() => {
     prevStep,
     handleConditionalChange,
     handleCustomerSubmit,
+    copyTextSummary,
     shareJsonFile,
     downloadJson,
     toast: showToast
